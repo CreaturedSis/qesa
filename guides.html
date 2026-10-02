@@ -108,6 +108,17 @@ button:hover { border-color: var(--gold); }
 .tal-opt { padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; font-size: .82rem; color: var(--muted); line-height: 1.3; overflow-wrap: anywhere; }
 .tal-opt.pick { border-color: var(--gold); color: var(--ink); background: var(--panel-2); }
 .tal-lv { align-self: center; justify-self: center; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--panel-2); color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: .88rem; }
+.tab[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: #1a140c; font-weight: 700; }
+.vchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.vdesc { margin: 0; font-size: .9rem; }
+.vdesc b { color: var(--gold); font-weight: 500; }
+.it .pct { position: absolute; top: 3px; left: 4px; font-size: .62rem; font-weight: 700; padding: 0 4px; border-radius: 3px; background: rgba(21,18,15,.82); color: var(--ink); }
+.tal-opt .p { float: right; margin-left: 8px; color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+.neu { display: flex; flex-wrap: wrap; gap: 8px; }
+.pro-wrap { display: grid; gap: 18px; min-width: 0; }
 details.changes { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; }
 details.changes summary { cursor: pointer; font-family: var(--display); font-weight: 700; color: var(--gold); }
 .ch-body { display: grid; gap: 10px; margin-top: 10px; }
@@ -126,7 +137,7 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
   <header class="top">
     <div>
       <h1>Гайды <span>героев</span></h1>
-      <p class="sub">Выбери героя и получишь сборку по стадиям от старта до гиперлейта, прокачку способностей и таланты.</p>
+      <p class="sub">Выбери героя и позицию: получишь варианты билда по стадиям от старта до гиперлейта, прокачку и таланты по данным про-матчей.</p>
     </div>
     <div class="live">
       <button type="button" id="rand" class="btn-gold">Случайный герой</button>
@@ -161,8 +172,8 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
   </details>
 
   <footer>
-    <span>Сборки по стадиям построены по недавним публичным матчам из <a href="https://www.opendota.com" target="_blank" rel="noopener">OpenDota</a>: показаны предметы, которые за героя покупали чаще всего (выборка небольшая и без деления на позиции). Списки «Ситуативные» и сборки героев без данных взяты из официальных рекомендаций Valve (<a href="https://github.com/SteamDatabase/GameTracking-Dota2" target="_blank" rel="noopener">SteamDatabase/GameTracking-Dota2</a>, к патчу 7.40). Предметы, удалённые в 7.41, я убрал. Актуальный патч на момент сборки: 7.41f. «Гиперлейт» это самые дорогие предметы (от 4000 золота), которые покупали за героя в поздней игре. Статистика общая на героя, а не под вашу позицию, поэтому для меты по ролям откройте ссылки на ProTracker и Dotabuff у героя.</span>
-    <span>Способности и таланты: <a href="https://github.com/odota/dotaconstants" target="_blank" rel="noopener">odota/dotaconstants</a>. Иконки: <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, изображения принадлежат Valve Corporation. Порядок прокачки составлен вручную для 91 героя, выбор талантов подобран по роли и носит рекомендательный характер.</span>
+    <span>Билды, варианты, прокачка, таланты и нейтральные предметы построены по про-матчам (Captains Mode) с патча 7.41 из <a href="https://www.opendota.com" target="_blank" rel="noopener">OpenDota</a>. Позиции определены автоматически по линии и заработку золота, варианты найдены по наборам итоговых предметов. У редких героев выборка небольшая, ориентируйтесь на число игр у вкладки. Список «Ситуативные» взят из рекомендаций Valve (<a href="https://github.com/SteamDatabase/GameTracking-Dota2" target="_blank" rel="noopener">SteamDatabase/GameTracking-Dota2</a>). Удалённые в 7.41 предметы убраны, актуальный патч на момент сборки: 7.41f. Для живой меты по рейтингу откройте ссылки на ProTracker и Dotabuff у героя.</span>
+    <span>Способности и таланты: <a href="https://github.com/odota/dotaconstants" target="_blank" rel="noopener">odota/dotaconstants</a>. Иконки: <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, изображения принадлежат Valve Corporation. Прокачка и таланты взяты из про-матчей.</span>
   </footer>
 </div>
 <script src="heroes.js"></script>
@@ -217,6 +228,103 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
     return f;
   }
 
+  function itemFig2(e, stage) {
+    const f = mk("figure", "it");
+    const im = mk("img"); im.src = IT_ICON[e[2]] || ""; im.alt = ""; im.width = 60; im.height = 44;
+    f.append(im, mk("figcaption", "", e[0]));
+    if (stage === "s" && e[1] > 1) f.append(mk("span", "cnt", "×" + e[1]));
+    else if (e[3]) f.append(mk("span", "pct", e[3] + "%"));
+    return f;
+  }
+
+  function renderPro(h, box) {
+    const wrap = mk("div", "pro-wrap"); box.append(wrap);
+    let pi = 0, vi = 0;
+    const draw = () => {
+      wrap.innerHTML = "";
+      const P = h.pd[pi], V = P.v[Math.min(vi, P.v.length - 1)];
+      // позиции и варианты
+      const bs = mk("section", "sec");
+      const h3 = mk("h3", "", "Билд"); h3.append(mk("small", "", `по ${V.n} играм, позиция ${P.p}`));
+      bs.append(h3);
+      const tabs = mk("div", "tabs"); tabs.setAttribute("role", "group"); tabs.setAttribute("aria-label", "Позиция");
+      h.pd.forEach((p, i) => {
+        const b = mk("button", "tab", `Pos ${p.p} · ${p.n} игр`); b.type = "button"; b.setAttribute("aria-pressed", String(i === pi));
+        b.addEventListener("click", () => { pi = i; vi = 0; draw(); });
+        tabs.append(b);
+      });
+      bs.append(tabs);
+      if (P.v.length > 1) {
+        const vc = mk("div", "tabs"); vc.setAttribute("role", "group"); vc.setAttribute("aria-label", "Вариант билда");
+        P.v.forEach((v, i) => {
+          const b = mk("button", "tab", `${v.l} · ${v.n}`); b.type = "button"; b.setAttribute("aria-pressed", String(i === vi));
+          b.addEventListener("click", () => { vi = i; draw(); });
+          vc.append(b);
+        });
+        bs.append(vc);
+      }
+      if (V.d) { const p = mk("p", "vdesc"); p.append(mk("b", "", "Ключевые предметы: "), document.createTextNode(V.d)); bs.append(p); }
+      const st = mk("div", "stages");
+      STAGES.forEach(([k, title, time]) => {
+        let list = k === "o" ? ((h.b && h.b.o) || []) : (V.st[k] || []);
+        if (!list.length) return;
+        const row = mk("div", "stage"), tt = mk("div", "st-title"), its = mk("div", "st-items");
+        tt.append(mk("b", "", title), mk("span", "", time));
+        if (k === "o") tt.append(mk("span", "src", "рекомендация Valve"));
+        list.forEach(e => its.append(k === "o" ? itemFig(e) : itemFig2(e, k)));
+        row.append(tt, its); st.append(row);
+      });
+      bs.append(st);
+      bs.append(mk("p", "note", "Источник: про-матчи (Captains Mode) с патча 7.41 из OpenDota. Предметы стадии отсортированы по времени покупки. Процент: в какой доле игр варианта предмет купили, на старте ×N это число штук. Варианты найдены автоматически по наборам предметов."));
+      wrap.append(bs);
+
+      // нейтральные
+      if (P.neu && P.neu.length) {
+        const ns = mk("section", "sec"); ns.append(mk("h3", "", "Нейтральные предметы"));
+        const nr = mk("div", "neu");
+        P.neu.forEach(e => nr.append(itemFig2([e[0], 1, e[2], e[1]], "n")));
+        ns.append(nr, mk("p", "note", "Самые частые нейтральные предметы героя на этой позиции и доля игр с ними."));
+        wrap.append(ns);
+      }
+
+      // прокачка
+      if (P.sk) {
+        const sk = mk("section", "sec");
+        const h3s = mk("h3", "", "Прокачка способностей"); h3s.append(mk("small", "", `типичный порядок по ${P.sk.g} играм`));
+        sk.append(h3s);
+        const scroll = mk("div", "skills-scroll"), grid = mk("div", "skills");
+        grid.append(mk("div", "lab lv"));
+        for (let l = 1; l <= 25; l++) grid.append(mk("div", "lv", l));
+        const seq = P.sk.seq;
+        P.sk.rows.forEach((a, ri) => {
+          const lab = mk("div", "lab"), ic = mk("img"); ic.src = AB_ICON[a.k] || ""; ic.alt = ""; ic.width = 22; ic.height = 22;
+          lab.append(ic, mk("span", "", a.n)); lab.title = a.n; grid.append(lab);
+          const cnt = seq.filter(x => x === ri).length;
+          for (let l = 1; l <= 25; l++) grid.append(mk("div", (cnt <= 3 ? "ult " : "") + (seq[l - 1] === ri ? "on" : "")));
+        });
+        const tl = mk("div", "lab"); tl.append(mk("span", "", "Таланты")); grid.append(tl);
+        for (let l = 1; l <= 25; l++) grid.append(mk("div", "tl " + (seq[l - 1] === "t" ? "on" : "")));
+        scroll.append(grid); sk.append(scroll);
+        sk.append(mk("p", "note", "Это реальная последовательность одной из игр, наиболее похожая на остальные. Золотая точка: уровень способности, красная: ультимейт, фиолетовый квадрат: талант."));
+        wrap.append(sk);
+        // таланты
+        const ts = mk("section", "sec"); ts.append(mk("h3", "", "Таланты"));
+        const tal = mk("div", "tal");
+        [3, 2, 1, 0].forEach(i => {
+          const tier = P.sk.tal[i]; if (!tier || tier.length < 2) return;
+          const hi = tier[0][1] >= tier[1][1] ? 0 : 1;
+          const row = mk("div", "tal-row");
+          const opt = (x, pick) => { const d = mk("div", "tal-opt" + (pick ? " pick" : ""), x[0]); d.append(mk("span", "p", x[1] + "%")); return d; };
+          row.append(opt(tier[0], hi === 0), mk("div", "tal-lv", [10, 15, 20, 25][i]), opt(tier[1], hi === 1));
+          tal.append(row);
+        });
+        ts.append(tal, mk("p", "note", "Проценты показывают, как часто игроки брали талант в этой паре. Выделен более частый."));
+        wrap.append(ts);
+      }
+    };
+    draw();
+  }
+
   function slug(n) { return n.toLowerCase().replace(/'/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
 
   function renderGuide(h) {
@@ -228,6 +336,7 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
     const t = mk("div", "g-title"); t.append(mk("h2", "", h.n));
     const chips = mk("div", "chips");
     chips.append(mk("span", "chip attr-" + h.a, ATTR[h.a]), mk("span", "chip", h.t === "Melee" ? "Ближний бой" : "Дальний бой"));
+    if (h.tg) chips.append(mk("span", "chip", `Про-матчей с 7.41: ${h.tg}`));
     h.r.forEach(r => chips.append(mk("span", "chip", r)));
     if (h.pos) chips.append(mk("span", "chip", "Основная позиция: " + h.pos));
     if (h.ln) {
@@ -243,6 +352,7 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
     live.append(pt, db, mk("small", "", "Живая статистика матчей по ролям"));
     t.append(live);
     head.append(im, t); box.append(head);
+    if (h.pd && h.pd.length) { renderPro(h, box); return; }
 
     // предметы
     const is = mk("section", "sec"); is.append(mk("h3", "", "Предметы по стадиям"));

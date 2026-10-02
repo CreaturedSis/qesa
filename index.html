@@ -338,7 +338,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
   </section>
 
   <footer>
-    <span class="pro-only">Предметы по стадиям построены по недавним публичным матчам OpenDota (что чаще покупали за героя), «Ситуативные» взяты из рекомендаций Valve. Удалённые в патче 7.41 предметы убраны. Это общая рекомендация, а не статистика матчей: актуальные сборки под вашу роль смотрите на <a href="https://dota2protracker.com" target="_blank" rel="noopener">dota2protracker.com</a>. Порядок прокачки составлен вручную, выбор талантов подобран по роли героя.</span>
+    <span class="pro-only">Предметы по стадиям, прокачка и таланты построены по про-матчам (Captains Mode) с патча 7.41 из OpenDota, «Ситуативные» взяты из рекомендаций Valve. Удалённые в патче 7.41 предметы убраны. Это общая рекомендация, а не статистика матчей: актуальные сборки под вашу роль смотрите на <a href="https://dota2protracker.com" target="_blank" rel="noopener">dota2protracker.com</a>.</span>
     <span>Иконки героев и предметов взяты из открытого репозитория <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, сами изображения принадлежат Valve Corporation.</span>
     <span>Связки с пометкой «из обзоров» взяты из этих материалов, остальные это известная классика. Патчи меняют героев, поэтому перед катками загляни в актуальные изменения.</span>
     <ul>
@@ -879,9 +879,14 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     const g = hasGuide(p.hero[0]) ? GUIDES[p.hero[0]] : null;
     if (!g) { box.append(mk("p", "g-note", "Для этого героя гайда пока нет.")); return; }
     const assigned = p.roll.pos;
+    const pp = g.pp && (g.pp[String(assigned)] || g.pp[String(g.pos)]);
+    const gp = pp ? pp : null;
+    const gseq = gp && gp.sk ? gp.sk : g.sk;
+    const gb = gp ? Object.assign({}, g.b, gp.b, { o: (g.b && g.b.o) || [] }) : g.b;
     // прокачка
     const sk = mk("section", "g-sec");
-    const h3 = mk("h3", "", "Прокачка"); h3.append(mk("small", "", `Pos ${g.pos}` + (assigned !== g.pos ? `, по связке Pos ${assigned}` : "")));
+    const usedPos = gp && g.pp[String(assigned)] ? assigned : g.pos;
+    const h3 = mk("h3", "", "Прокачка"); h3.append(mk("small", "", `Pos ${usedPos}` + (gp ? `, про-матчи: ${gp.n}` : "")));
     sk.append(h3);
     const scroll = mk("div", "skills-scroll"), grid = mk("div", "skills");
     grid.append(mk("div", "lab lv"));
@@ -891,11 +896,11 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
       const im = mk("img"); im.src = ABILITY_ICON[a.k] || ""; im.alt = ""; im.width = 22; im.height = 22;
       lab.append(im, mk("span", "", a.n)); lab.title = a.n;
       grid.append(lab);
-      for (let l = 1; l <= 25; l++) grid.append(mk("div", (L === "r" ? "ult " : "") + (g.sk[l - 1] === L ? "on" : "")));
+      for (let l = 1; l <= 25; l++) grid.append(mk("div", (L === "r" ? "ult " : "") + (gseq[l - 1] === L ? "on" : "")));
     });
     const tl = mk("div", "lab"); tl.append(mk("span", "", "Таланты"));
     grid.append(tl);
-    for (let l = 1; l <= 25; l++) grid.append(mk("div", "tl " + (g.sk[l - 1] === "t" ? "on" : "")));
+    for (let l = 1; l <= 25; l++) grid.append(mk("div", "tl " + (gseq[l - 1] === "t" ? "on" : "")));
     scroll.append(grid); sk.append(scroll);
     sk.append(mk("p", "g-note", "Золотая точка: уровень способности. Красная: ультимейт. Фиолетовый квадрат: талант."));
     box.append(sk);
@@ -913,14 +918,21 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     const is = mk("section", "g-sec"); is.append(mk("h3", "", "Предметы по стадиям"));
     const st = mk("div", "stages");
     STAGES.forEach(([k, title, time]) => {
-      const list = (g.b && g.b[k]) || [];
+      const list = (gb && gb[k]) || [];
       if (!list.length) return;
       const row = mk("div", "stage"), tt = mk("div", "st-title"), its = mk("div", "st-items");
       tt.append(mk("b", "", title), mk("span", "", time));
       list.forEach(e => its.append(itemFig(e)));
       row.append(tt, its); st.append(row);
     });
-    is.append(st); box.append(is);
+    is.append(st);
+    if (gp && gp.vn > 1) {
+      const a = mk("a", "", `Показан основной билд, всего вариантов: ${gp.vn}. Все варианты в гайдах героев.`);
+      a.href = "https://claude.ai/artifact/8oUD5M1GQUN3oDckT6XB3c#" + p.hero[0].toLowerCase().replace(/'/g, "").replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+      a.target = "_blank"; a.rel = "noopener"; a.className = "g-note";
+      is.append(a);
+    }
+    box.append(is);
   }
 
   // ── Рендер ────────────────────────────────────────────────────────
