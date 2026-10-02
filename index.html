@@ -39,7 +39,7 @@ body {
 .nav-tab { font: inherit; cursor: pointer; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 8px 16px; font-weight: 700; }
 .nav-tab[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
 .nav-tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-#viewRoulette, #viewGuides, #viewRandom, #viewCounters { padding-top: 20px; }
+#viewRoulette, #viewGuides, #viewRandom, #viewCounters, #viewCombos { padding-top: 20px; }
 .linkbtn { background: none; border: 0; padding: 0; color: var(--gold); text-decoration: underline; cursor: pointer; font: inherit; text-align: left; }
 
 #viewRoulette {
@@ -214,7 +214,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
 .duel.combo-mode [data-act="lock"] { display: none; }
 @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
 }
-#viewGuides, #viewRandom, #viewCounters {
+#viewGuides, #viewRandom, #viewCounters, #viewCombos {
 .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
 header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
 h1 { font-family: var(--display); font-weight: 400; margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1; text-wrap: balance; }
@@ -365,6 +365,46 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
 .c-empty { color: var(--muted); font-size: .88rem; margin: 0; }
 .c-note { margin: 0; font-size: .85rem; color: var(--muted); }
 }
+#viewCombos {
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+.k-head h1 { font-family: var(--display); font-weight: 400; margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1; text-wrap: balance; }
+.k-head h1 span { color: var(--gold); }
+.k-head p { margin: 6px 0 0; color: var(--muted); max-width: 68ch; }
+.k-result { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 16px; min-width: 0; }
+.k-size { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.k-size .eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 700; margin-right: 8px; }
+.k-team { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.k-slot { display: grid; gap: 3px; width: 92px; padding: 4px; border: 1px dashed var(--line); border-radius: 4px; text-align: center; font-size: .72rem; color: var(--muted); min-height: 66px; align-content: center; background: var(--panel-2); }
+.k-slot.filled { border-style: solid; border-color: var(--gold); cursor: pointer; color: var(--ink); font: inherit; font-size: .72rem; }
+.k-slot img { width: 100%; aspect-ratio: 128 / 72; object-fit: cover; border-radius: 3px; display: block; }
+.k-slot .x { color: var(--dire-bright); font-size: .68rem; }
+.k-clear { align-self: center; }
+.k-sub { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 0; color: var(--gold); }
+.k-note { margin: 0; font-size: .85rem; color: var(--muted); }
+.k-tier { display: grid; gap: 8px; }
+.k-tier-h { display: flex; justify-content: space-between; align-items: baseline; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.k-tier.t1 .k-tier-h { color: var(--gold); border-bottom-color: var(--gold); }
+.k-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.k-list.wide { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.k-card { display: grid; gap: 6px; padding: 8px; background: var(--panel-2); border: 1px solid transparent; border-radius: 4px; min-width: 0; }
+.k-card:hover { border-color: var(--gold); }
+.k-card .row { display: flex; gap: 4px; }
+.k-card .row div { flex: 1 1 0; min-width: 0; text-align: center; font-size: .66rem; line-height: 1.1; color: var(--ink); }
+.k-card .row img { width: 100%; aspect-ratio: 128 / 72; object-fit: cover; border-radius: 3px; display: block; margin-bottom: 2px; }
+.k-card .row i { display: block; font-style: normal; color: var(--muted); font-size: .62rem; }
+.k-card .meta { display: flex; justify-content: space-between; gap: 8px; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.k-card .meta b { color: var(--gold); font-size: .9rem; }
+.k-card .meta b.bad { color: var(--dire-bright); }
+.k-card button.add { font: inherit; font-size: .74rem; padding: 3px 8px; justify-self: start; }
+.k-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 760px) { .k-cols { grid-template-columns: minmax(0, 1fr); } }
+.k-col { border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); padding: 12px; display: grid; gap: 12px; min-width: 0; }
+.k-col.good { --accent: var(--radiant); }
+.k-col.bad { --accent: var(--dire-bright); }
+.k-col > h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 0; color: var(--accent); }
+.k-col .k-card { background: var(--panel); }
+.k-empty { color: var(--muted); margin: 0; }
+}
 </style>
 </head>
 <body>
@@ -373,6 +413,7 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
   <button type="button" class="nav-tab" data-view="guides" aria-pressed="false">Гайды героев</button>
   <button type="button" class="nav-tab" data-view="random" aria-pressed="false">Рандом героя</button>
   <button type="button" class="nav-tab" data-view="counters" aria-pressed="false">Контрпики</button>
+  <button type="button" class="nav-tab" data-view="combos" aria-pressed="false">Связки</button>
 </nav>
 <div id="viewRoulette">
 <div class="wrap fun-mode" id="wrap">
@@ -635,10 +676,45 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
   </div>
 </div>
 </div>
+<div id="viewCombos" hidden>
+<div class="wrap">
+  <header class="k-head">
+    <h1>Связ<span>ки</span></h1>
+    <p>Выбери, сколько вас играет: двое, трое или пятеро. Добавь героев, которые у вас уже есть, и увидишь, кого взять к ним. Без выбора показываю лучшие связки целиком.</p>
+  </header>
+  <div class="layout">
+    <aside class="picker" aria-label="Выбор героя">
+      <input id="kSearch" class="search" type="search" placeholder="Найти героя" autocomplete="off" aria-label="Поиск героя">
+      <div class="seg" role="group" aria-label="Атрибут" id="kAttrSeg">
+        <button type="button" data-v="all" aria-pressed="true">Все</button>
+        <button type="button" data-v="str" aria-pressed="false">Сила</button>
+        <button type="button" data-v="agi" aria-pressed="false">Ловкость</button>
+        <button type="button" data-v="int" aria-pressed="false">Интеллект</button>
+        <button type="button" data-v="uni" aria-pressed="false">Универсал</button>
+      </div>
+      <div class="count" id="kCount"></div>
+      <div class="grid" id="kGrid" role="list"></div>
+    </aside>
+    <main class="k-result" id="kResult" aria-live="polite">
+      <div class="k-size">
+        <span class="eyebrow" id="kSizeLbl">Игроков</span>
+        <div class="seg" role="group" aria-labelledby="kSizeLbl" id="kSizeSeg">
+          <button type="button" data-v="2" aria-pressed="true">2</button>
+          <button type="button" data-v="3" aria-pressed="false">3</button>
+          <button type="button" data-v="5" aria-pressed="false">5</button>
+        </div>
+      </div>
+      <div class="k-team" id="kTeam"></div>
+      <div id="kOut"></div>
+    </main>
+  </div>
+</div>
+</div>
 <script src="icons.js"></script>
 <script src="guides.js"></script>
 <script src="heroes.js"></script>
 <script src="matchups.js"></script>
+<script src="synergy.js"></script>
 <script>
 (() => {
   // ── Герои: [имя, атрибут, позиции] ────────────────────────────────
@@ -1904,14 +1980,266 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
 </script>
 <script>
 (() => {
-  const views = { roulette: document.getElementById("viewRoulette"), guides: document.getElementById("viewGuides"), random: document.getElementById("viewRandom"), counters: document.getElementById("viewCounters") };
+  const mk = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const heroes = HERO_DB;
+  const byId = Object.fromEntries(heroes.map(h => [h.id, h]));
+  const MIN_PAIR = 150, MIN_TRIPLE = 120;
+  // общий винрейт героев
+  const base = {};
+  Object.entries(MATCHUPS).forEach(([id, rows]) => { let g = 0, w = 0; rows.forEach(r => { g += r[1]; w += r[2]; }); if (g) base[id] = w / g; });
+  // данные пар и троек
+  const pair = {};
+  Object.entries(SYN_PAIRS).forEach(([a, rows]) => { rows.forEach(([b, g, w]) => { pair[a + "," + b] = [g, w]; }); });
+  const tkey = (a, b, c) => [a, b, c].sort((x, y) => x - y).join(",");
+  const triple = {};
+  SYN_TRIPLES.forEach(([a, b, c, g, w, s]) => { triple[tkey(a, b, c)] = [g, w, s || 0]; });
+  // отклонение с поправкой на погрешность: чем меньше игр, тем сильнее оно сжимается к нулю (сортируем по r)
+  const shrink = (x, geff) => { const se = Math.sqrt(0.25 / (geff || x.g)) * 100; x.r = x.d > 0 ? Math.max(0, x.d - se) : Math.min(0, x.d + se); return x; };
+  const pairDelta = (a, b) => {
+    const s = pair[a + "," + b]; if (!s || s[0] < MIN_PAIR || base[a] == null || base[b] == null) return null;
+    const exp = 0.5 + (base[a] - 0.5) + (base[b] - 0.5);
+    return shrink({ d: (s[1] / s[0] - exp) * 100, g: s[0], wr: s[1] / s[0] });
+  };
+  const tripleDelta = (a, b, c) => {
+    const s = triple[tkey(a, b, c)]; if (!s || s[0] < MIN_TRIPLE || [a, b, c].some(x => base[x] == null)) return null;
+    const exp = 0.5 + (base[a] - 0.5) + (base[b] - 0.5) + (base[c] - 0.5);
+    return shrink({ d: (s[1] / s[0] - exp) * 100, g: s[0], wr: s[1] / s[0], approx: !!s[2] }, s[2] ? s[0] / 4 : s[0]);
+  };
+  // позиции героев для пятёрок: доли игр на каждой позиции (про-матчи)
+  const posShare = {};
+  heroes.forEach(h => {
+    const tot = (h.pd || []).reduce((s, p) => s + p.n, 0), m = {};
+    (h.pd || []).forEach(p => { m[p.p] = p.n / tot; });
+    posShare[h.id] = m;
+  });
+  const allowed = id => Object.entries(posShare[id] || {}).filter(([p, s]) => s >= 0.15).map(([p]) => Number(p));
+  function assignPositions(ids) { // перебор перестановок позиций 1..5 с максимальной суммой долей
+    let best = null;
+    const used = new Set(), cur = [];
+    (function rec(i, score) {
+      if (i === ids.length) { if (!best || score > best.score) best = { score, pos: cur.slice() }; return; }
+      for (let p = 1; p <= 5; p++) {
+        if (used.has(p)) continue;
+        const s = (posShare[ids[i]] || {})[p] || 0; if (s < 0.15) continue;
+        used.add(p); cur.push(p); rec(i + 1, score + s); cur.pop(); used.delete(p);
+      }
+    })(0, 0);
+    return best;
+  }
+
+  let size = 2, team = [], attr = "all", query = "";
+  const SIZE_NAME = { 2: "дуэт", 3: "тройка", 5: "команда" };
+
+  // --- карточки результата ---
+  function card(ids, d, extra, opts) {
+    const c = mk("div", "k-card");
+    const row = mk("div", "row");
+    ids.forEach((id, i) => {
+      const h = byId[id], cell = mk("div");
+      const im = mk("img"); im.src = PORTRAIT[h.k] || ""; im.alt = ""; im.width = 128; im.height = 72; im.loading = "lazy";
+      cell.append(im, document.createTextNode(h.n));
+      if (opts && opts.pos) cell.append(mk("i", "", "Pos " + opts.pos[i]));
+      row.append(cell);
+    });
+    c.append(row);
+    const meta = mk("div", "meta");
+    const b = mk("b", d < 0 ? "bad" : "", (d >= 0 ? "+" : "−") + Math.abs(d).toFixed(1) + " п.п.");
+    meta.append(b, mk("span", "", extra));
+    c.append(meta);
+    if (opts && opts.add) {
+      const a = mk("button", "add", "Добавить в команду"); a.type = "button";
+      a.addEventListener("click", () => { opts.add.forEach(id => addHero(id)); });
+      c.append(a);
+    }
+    return c;
+  }
+  function tiers(list, mkCard, sizes) {
+    const wrap = mk("div", "k-tiers");
+    const titles = ["Сильнее всего", "Средне", "Слабо"]; let i = 0; wrap.style.display = "grid"; wrap.style.gap = "14px";
+    sizes.forEach((n, t) => {
+      const part = list.slice(i, i + n); i += n; if (!part.length) return;
+      const tier = mk("div", "k-tier t" + (t + 1));
+      const h = mk("div", "k-tier-h"); h.append(mk("span", "", titles[t]), mk("span", "", String(part.length)));
+      const g = mk("div", "k-list" + (size > 2 ? " wide" : "")); part.forEach(x => g.append(mkCard(x)));
+      tier.append(h, g); wrap.append(tier);
+    });
+    return wrap;
+  }
+
+  // --- расчёты ---
+  const ids = () => team.slice();
+  function topPairs() {
+    const out = [];
+    heroes.forEach(a => heroes.forEach(b => { if (a.id < b.id) { const p = pairDelta(a.id, b.id); if (p && p.r > 0) out.push({ ids: [a.id, b.id], ...p }); } }));
+    return out.sort((x, y) => y.r - x.r);
+  }
+  function partners(a) {
+    const out = [];
+    heroes.forEach(b => { if (b.id !== a) { const p = pairDelta(a, b.id); if (p) out.push({ ids: [a, b.id], b: b.id, ...p }); } });
+    return out;
+  }
+  function topTriples(filterIds) {
+    const out = [];
+    SYN_TRIPLES.forEach(([a, b, c]) => {
+      if (filterIds.some(x => x !== a && x !== b && x !== c)) return;
+      const t = tripleDelta(a, b, c); if (t && t.r > 0) out.push({ ids: [a, b, c], ...t });
+    });
+    return out.sort((x, y) => y.r - x.r);
+  }
+  function pairSum(list) { // сумма отклонений по всем парам внутри набора
+    let s = 0, n = 0;
+    for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) { const p = pairDelta(list[i], list[j]); if (p) { s += p.r; n++; } }
+    return { s, n };
+  }
+  function completeTeam(fixed, total) { // лучевой поиск: достраиваем команду до total героев с учётом позиций
+    const pool = heroes.filter(h => allowed(h.id).length).map(h => h.id);
+    const feasible = list => !!assignPositions(list);
+    if (!feasible(fixed)) return [];
+    let beam = [{ list: fixed.slice(), score: pairSum(fixed).s }];
+    for (let step = fixed.length; step < total; step++) {
+      const next = new Map();
+      beam.forEach(st => {
+        pool.forEach(id => {
+          if (st.list.includes(id)) return;
+          const cand = st.list.concat(id);
+          let add = 0; st.list.forEach(x => { const p = pairDelta(x, id); if (p) add += p.r; });
+          const key = cand.slice().sort((a, b) => a - b).join(",");
+          const sc = st.score + add;
+          if (!next.has(key) || next.get(key).score < sc) next.set(key, { list: cand, score: sc });
+        });
+      });
+      const sorted = [...next.values()].sort((a, b) => b.score - a.score);
+      const kept = [];
+      for (const s of sorted) { if (feasible(s.list)) kept.push(s); if (kept.length >= 40) break; }
+      beam = kept;
+      if (!beam.length) return [];
+    }
+    return beam.slice(0, 8).map(s => ({ ids: s.list, d: s.score, assign: assignPositions(s.list) }));
+  }
+
+  // --- вывод ---
+  function render() {
+    renderTeam();
+    const out = document.getElementById("kOut"); out.innerHTML = "";
+    const fixed = ids();
+    if (size === 2) {
+      if (fixed.length === 0) {
+        out.append(mk("h3", "k-sub", "Лучшие дуэты"));
+        const list = topPairs();
+        out.append(tiers(list, x => card(x.ids, x.d, `${x.g.toLocaleString("ru-RU")} игр, винрейт ${(x.wr * 100).toFixed(1)}%`, { add: x.ids }), [8, 12, 16]));
+      } else {
+        const a = fixed[0], h = byId[a], all = partners(a);
+        const good = all.filter(x => x.r >= 0.3).sort((x, y) => y.r - x.r), bad = all.filter(x => x.r <= -0.3).sort((x, y) => x.r - y.r);
+        const cols = mk("div", "k-cols");
+        const mkCol = (cls, title, list) => {
+          const col = mk("section", "k-col " + cls); col.append(mk("h3", "", title));
+          if (!list.length) col.append(mk("p", "k-empty", "Явных вариантов нет."));
+          else col.append(tiers(list, x => card(x.ids, x.d, `${x.g.toLocaleString("ru-RU")} игр, ${(x.wr * 100).toFixed(1)}%`, { add: [x.b] }), [6, 8, 10]));
+          return col;
+        };
+        cols.append(mkCol("good", `Хорошо играют вместе с ${h.n}`, good), mkCol("bad", `Плохо сочетаются с ${h.n}`, bad));
+        out.append(cols);
+      }
+    } else if (size === 3) {
+      if (fixed.length >= 3) { out.append(mk("p", "k-empty", "Команда из трёх уже собрана.")); }
+      else {
+        let list;
+        if (fixed.length === 0) { out.append(mk("h3", "k-sub", "Лучшие тройки")); list = topTriples([]); }
+        else if (fixed.length === 1) { out.append(mk("h3", "k-sub", `Лучшие тройки с ${byId[fixed[0]].n}`)); list = topTriples(fixed); }
+        else {
+          out.append(mk("h3", "k-sub", `Кого взять третьим к ${fixed.map(i => byId[i].n).join(" и ")}`));
+          list = topTriples(fixed);
+          // если данных по тройкам мало, добавляем расчёт по парам
+          const have = new Set(list.map(x => x.ids.find(i => !fixed.includes(i))));
+          if (list.length < 12) heroes.forEach(h => {
+            if (fixed.includes(h.id) || have.has(h.id)) return;
+            const ps = pairSum(fixed.concat(h.id)); if (ps.n >= 2 && ps.s > 0) list.push({ ids: fixed.concat(h.id), d: ps.s, r: ps.s, g: 0, wr: 0, model: true });
+          });
+          list.sort((x, y) => y.r - x.r);
+        }
+        if (!list.length && fixed.length === 1) {
+          out.append(mk("p", "k-note", "Заметных троек с этим героем в данных нет, поэтому показаны лучшие партнёры по парам. Выберите одного из них, чтобы подобрать третьего."));
+          const good = partners(fixed[0]).filter(x => x.r >= 0.3).sort((x, y) => y.r - x.r);
+          out.append(tiers(good, x => card(x.ids, x.d, `${x.g.toLocaleString("ru-RU")} игр, ${(x.wr * 100).toFixed(1)}%`, { add: [x.b] }), [8, 12, 16]));
+        } else
+        out.append(tiers(list, x => card(x.ids, x.d, x.model ? "расчёт по парам" : `${x.approx ? "≈" : ""}${x.g.toLocaleString("ru-RU")} игр, ${(x.wr * 100).toFixed(1)}%`, { add: x.ids.filter(i => !fixed.includes(i)) }), [8, 12, 16]));
+      }
+    } else {
+      out.append(mk("h3", "k-sub", fixed.length ? `Достроить команду к ${fixed.map(i => byId[i].n).join(", ")}` : "Лучшие пятёрки"));
+      if (fixed.length && !assignPositions(fixed)) { out.append(mk("p", "k-empty", "Эти герои не помещаются в одну команду по позициям, попробуйте убрать кого-то.")); return; }
+      const res = completeTeam(fixed, 5);
+      if (!res.length) out.append(mk("p", "k-empty", "Не удалось подобрать команду."));
+      const list = mk("div", "k-list wide");
+      res.forEach(r => {
+        const order = r.ids.map((id, i) => ({ id, pos: r.assign ? r.assign.pos[i] : 0 })).sort((a, b) => a.pos - b.pos);
+        list.append(card(order.map(o => o.id), r.d, "сумма по 10 парам с поправкой на погрешность", { pos: order.map(o => o.pos), add: r.ids.filter(i => !fixed.includes(i)) }));
+      });
+      out.append(list);
+      out.append(mk("p", "k-note", "Пятёрки подбираются так, чтобы у каждого героя была своя позиция 1–5 (по тому, где он играл в про-матчах), а сумма отклонений по всем десяти парам героев была наибольшей."));
+    }
+    out.append(mk("p", "k-note", `Число рядом это отклонение винрейта связки от ожидаемого по силе героев по отдельности (п.п. это процентные пункты). Порядок учитывает число игр: пары с малой выборкой опускаются ниже. Данные: публичные матчи OpenDota, ${typeof MATCHUP_INFO !== "undefined" ? MATCHUP_INFO : ""}. Пары меньше ${MIN_PAIR} игр и тройки меньше ${MIN_TRIPLE} игр не учитываются.`));
+  }
+  function renderTeam() {
+    const t = document.getElementById("kTeam"); t.innerHTML = "";
+    for (let i = 0; i < size; i++) {
+      const id = team[i];
+      if (id) {
+        const h = byId[id], b = mk("button", "k-slot filled"); b.type = "button"; b.title = "Убрать " + h.n;
+        const im = mk("img"); im.src = PORTRAIT[h.k] || ""; im.alt = ""; im.width = 128; im.height = 72;
+        b.append(im, document.createTextNode(h.n), mk("span", "x", "убрать"));
+        b.addEventListener("click", () => { team = team.filter(x => x !== id); render(); renderList(); });
+        t.append(b);
+      } else t.append(mk("div", "k-slot", i < size - 1 || team.length < size ? "место " + (i + 1) : "место " + (i + 1)));
+    }
+    if (team.length) { const c = mk("button", "k-clear", "Очистить"); c.type = "button"; c.addEventListener("click", () => { team = []; render(); renderList(); }); t.append(c); }
+  }
+  function addHero(id) {
+    if (team.includes(id)) return;
+    if (team.length >= size - 1) team = team.slice(0, size - 2);
+    team.push(id); render(); renderList();
+  }
+  const grid = document.getElementById("kGrid");
+  function renderList() {
+    const q = query.trim().toLowerCase();
+    const list = heroes.filter(h => (attr === "all" || h.a === attr) && (!q || h.n.toLowerCase().includes(q)));
+    grid.innerHTML = "";
+    list.forEach(h => {
+      const b = mk("button", "tile"); b.type = "button"; b.setAttribute("role", "listitem");
+      b.setAttribute("aria-pressed", String(team.includes(h.id))); b.title = h.n;
+      const im = mk("img"); im.src = PORTRAIT[h.k] || ""; im.alt = ""; im.width = 128; im.height = 72; im.loading = "lazy";
+      b.append(im, mk("span", "", h.n));
+      b.addEventListener("click", () => { if (team.includes(h.id)) team = team.filter(x => x !== h.id); else addHero(h.id); render(); renderList(); });
+      grid.append(b);
+    });
+    document.getElementById("kCount").textContent = list.length ? `Героев: ${list.length}. Нажми, чтобы добавить в команду.` : "Никого не нашлось, попробуйте другое имя";
+  }
+  document.getElementById("kSearch").addEventListener("input", e => { query = e.target.value; renderList(); });
+  document.getElementById("kAttrSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    attr = b.dataset.v;
+    document.querySelectorAll("#kAttrSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    renderList();
+  });
+  document.getElementById("kSizeSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    size = Number(b.dataset.v);
+    document.querySelectorAll("#kSizeSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    team = team.slice(0, size - 1); render(); renderList();
+  });
+  window.__combosInit = () => { if (!window.__combosDone) { window.__combosDone = true; render(); renderList(); } };
+})();
+</script>
+<script>
+(() => {
+  const views = { roulette: document.getElementById("viewRoulette"), guides: document.getElementById("viewGuides"), random: document.getElementById("viewRandom"), counters: document.getElementById("viewCounters"), combos: document.getElementById("viewCombos") };
   const tabs = document.querySelectorAll(".nav-tab");
   function showView(v, top) {
     Object.entries(views).forEach(([k, el]) => { el.hidden = k !== v; });
     tabs.forEach(t => t.setAttribute("aria-pressed", String(t.dataset.view === v)));
     if (top) window.scrollTo(0, 0);
     if (v === "random" && window.__rollHeroFirst) window.__rollHeroFirst();
-    try { if (v === "roulette") history.replaceState(null, "", "#roulette"); else if (v === "random") history.replaceState(null, "", "#random"); else if (v === "counters") { if (!location.hash.startsWith("#c-")) history.replaceState(null, "", "#counters"); } else if (!location.hash.startsWith("#g-")) history.replaceState(null, "", "#guides"); } catch {}
+    if (v === "combos" && window.__combosInit) window.__combosInit();
+    try { if (v === "roulette") history.replaceState(null, "", "#roulette"); else if (v === "random") history.replaceState(null, "", "#random"); else if (v === "combos") history.replaceState(null, "", "#combos"); else if (v === "counters") { if (!location.hash.startsWith("#c-")) history.replaceState(null, "", "#counters"); } else if (!location.hash.startsWith("#g-")) history.replaceState(null, "", "#guides"); } catch {}
   }
   tabs.forEach(t => t.addEventListener("click", () => showView(t.dataset.view, true)));
   window.openGuideByName = name => { showView("guides", false); if (window.__selectGuide) window.__selectGuide(name); window.scrollTo(0, 0); };
@@ -1922,8 +2250,9 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
     else if (location.hash === "#random") showView("random", false);
     else if (location.hash.startsWith("#c-")) { showView("counters", false); if (window.__selectCounterKey) window.__selectCounterKey(location.hash.slice(3)); }
     else if (location.hash === "#counters") showView("counters", false);
+    else if (location.hash === "#combos") showView("combos", false);
   });
-  showView(/^#(g-|guides)/.test(location.hash) ? "guides" : location.hash === "#random" ? "random" : /^#(c-|counters)/.test(location.hash) ? "counters" : "roulette", false);
+  showView(/^#(g-|guides)/.test(location.hash) ? "guides" : location.hash === "#random" ? "random" : /^#(c-|counters)/.test(location.hash) ? "counters" : location.hash === "#combos" ? "combos" : "roulette", false);
 })();
 </script>
 </body>
