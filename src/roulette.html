@@ -194,6 +194,8 @@ ol.build li.t-troll .kind { color: var(--troll); }
 .st-title span { font-size: .78rem; color: var(--muted); }
 .st-items { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
 .it { display: grid; gap: 3px; justify-items: center; width: 66px; margin: 0; position: relative; }
+.it .price { font-size: .68rem; color: var(--gold); font-variant-numeric: tabular-nums; margin-top: -2px; }
+.st-title span.sum { color: var(--ink); font-variant-numeric: tabular-nums; }
 .it .cnt { position: absolute; top: -4px; right: 1px; background: var(--gold); color: var(--on-gold); font-size: .68rem; font-weight: 700; padding: 0 5px; border-radius: 999px; }
 .it img { width: 56px; height: 41px; object-fit: cover; border-radius: 3px; border: 1px solid var(--line); background: var(--panel-2); }
 .it figcaption { font-size: .68rem; line-height: 1.15; text-align: center; color: var(--muted); overflow-wrap: anywhere; }
@@ -852,10 +854,12 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     ["o", "Ситуативные", "по обстановке в игре"],
   ];
   const mk = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const priceOf = e => (e[2] != null ? e[2] : (typeof ITEM_COST !== "undefined" && ITEM_COST[e[0]]) || 0);
   function itemFig(e) {
     const f = mk("figure", "it");
     const im = mk("img"); im.src = ITEM_ICON[e[0]] || ""; im.alt = ""; im.width = 56; im.height = 41;
     f.append(im, mk("figcaption", "", e[0]));
+    const c = priceOf(e); if (c) f.append(mk("span", "price", c.toLocaleString("ru-RU")));
     if (e[1] > 1) f.append(mk("span", "cnt", "×" + e[1]));
     return f;
   }
@@ -908,6 +912,10 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
       if (!list.length) return;
       const row = mk("div", "stage"), tt = mk("div", "st-title"), its = mk("div", "st-items");
       tt.append(mk("b", "", title), mk("span", "", time));
+      if (k !== "o") {
+        const tot = list.reduce((s, e) => s + priceOf(e) * (e[1] || 1), 0);
+        tt.append(mk("span", "sum", k === "s" ? `Потрачено ${tot.toLocaleString("ru-RU")} из 600` : `Итого ${tot.toLocaleString("ru-RU")}`));
+      }
       list.forEach(e => its.append(itemFig(e)));
       row.append(tt, its); st.append(row);
     });
