@@ -1,0 +1,163 @@
+<style>
+/* Вкладка «Контрпики»: слева выбор героя, справа две таблицы. Слева «страдают от героя», справа «хороши против героя», по три градации в каждой. */
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+.c-head h1 { font-family: var(--display); font-weight: 400; margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1; text-wrap: balance; }
+.c-head h1 span { color: var(--gold); }
+.c-head p { margin: 6px 0 0; color: var(--muted); max-width: 66ch; }
+.c-result { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 16px; min-width: 0; }
+.c-top { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.c-top img { width: 160px; height: 90px; max-width: 100%; border-radius: 4px; border: 1px solid var(--line); object-fit: cover; }
+.c-top h2 { font-family: var(--display); font-weight: 400; margin: 0; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.05; text-wrap: balance; }
+.c-top .c-info { display: grid; gap: 8px; min-width: 0; flex: 1 1 220px; }
+.c-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 760px) { .c-cols { grid-template-columns: minmax(0, 1fr); } }
+.c-col { border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); padding: 12px; display: grid; gap: 12px; min-width: 0; }
+.c-col.suffer { --accent: var(--radiant); }
+.c-col.counter { --accent: var(--dire-bright); }
+.c-col > h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 0; color: var(--accent); }
+.c-col > p { margin: -6px 0 0; font-size: .82rem; color: var(--muted); }
+.tier { display: grid; gap: 8px; }
+.tier-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.tier.t1 .tier-h { color: var(--accent); border-bottom-color: var(--accent); }
+.ctiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 6px; }
+.ct { display: grid; gap: 2px; padding: 4px; background: var(--panel); border: 1px solid transparent; border-radius: 4px; text-align: center; font-size: .72rem; line-height: 1.15; color: var(--muted); cursor: pointer; min-width: 0; font: inherit; font-size: .72rem; }
+.ct img { width: 100%; aspect-ratio: 128 / 72; object-fit: cover; border-radius: 3px; display: block; }
+.ct span { overflow-wrap: anywhere; color: var(--ink); }
+.ct b { color: var(--accent); font-variant-numeric: tabular-nums; font-size: .82rem; }
+.ct:hover, .ct:focus-visible { border-color: var(--accent); }
+.c-empty { color: var(--muted); font-size: .88rem; margin: 0; }
+.c-note { margin: 0; font-size: .85rem; color: var(--muted); }
+</style>
+<div class="wrap">
+  <header class="c-head">
+    <h1>Контр<span>пики</span></h1>
+    <p>Выбери героя и увидишь, против кого он играет лучше всего и кто хорош против него. Слева те, кто страдает от героя, справа те, кто его контрит. Внутри каждой таблицы три градации: сверху самые сильные.</p>
+  </header>
+  <div class="layout">
+    <aside class="picker" aria-label="Выбор героя">
+      <input id="cSearch" class="search" type="search" placeholder="Найти героя" autocomplete="off" aria-label="Поиск героя">
+      <div class="seg" role="group" aria-label="Атрибут" id="cAttrSeg">
+        <button type="button" data-v="all" aria-pressed="true">Все</button>
+        <button type="button" data-v="str" aria-pressed="false">Сила</button>
+        <button type="button" data-v="agi" aria-pressed="false">Ловкость</button>
+        <button type="button" data-v="int" aria-pressed="false">Интеллект</button>
+        <button type="button" data-v="uni" aria-pressed="false">Универсал</button>
+      </div>
+      <div class="count" id="cCount"></div>
+      <div class="grid" id="cGrid" role="list"></div>
+    </aside>
+    <main class="c-result" id="cResult" aria-live="polite"></main>
+  </div>
+</div>
+<script>
+(() => {
+  const ATTR = { str: "Сила", agi: "Ловкость", int: "Интеллект", uni: "Универсал" };
+  const mk = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const heroes = HERO_DB;
+  const byKey = Object.fromEntries(heroes.map(h => [h.k, h]));
+  const byId = Object.fromEntries(heroes.map(h => [h.id, h]));
+  // общий винрейт героя: победы / игры по всем его матчапам
+  const base = {};
+  Object.entries(MATCHUPS).forEach(([id, rows]) => {
+    let g = 0, w = 0; rows.forEach(r => { g += r[1]; w += r[2]; });
+    if (g) base[id] = { wr: w / g, games: g };
+  });
+  const MIN_GAMES = 150;
+  const TIERS = [[8, "Сильнее всего"], [12, "Средне"], [16, "Слабо"]];
+  let attr = "all", query = "", cur = null;
+
+  function split(list) {
+    const out = []; let i = 0;
+    TIERS.forEach(([n, title]) => { out.push({ title, items: list.slice(i, i + n) }); i += n; });
+    return out;
+  }
+  function analyze(h) {
+    const rows = MATCHUPS[h.id] || [], b = base[h.id];
+    const res = [];
+    rows.forEach(([opp, g, w]) => {
+      const o = byId[opp]; if (!o || !base[opp] || g < MIN_GAMES) return;
+      const wr = w / g;
+      const expected = 0.5 + (b.wr - 0.5) - (base[opp].wr - 0.5); // ожидаемый винрейт с учётом общей силы обоих героев
+      res.push({ o, wr, g, d: (wr - expected) * 100 });
+    });
+    const suffer = res.filter(x => x.d >= 0.5).sort((a, b2) => b2.d - a.d);
+    const counter = res.filter(x => x.d <= -0.5).sort((a, b2) => a.d - b2.d);
+    return { suffer, counter, b };
+  }
+  function tile(x, sign) {
+    const t = mk("button", "ct"); t.type = "button";
+    const im = mk("img"); im.src = PORTRAIT[x.o.k] || ""; im.alt = ""; im.width = 128; im.height = 72; im.loading = "lazy";
+    const v = Math.abs(x.d).toFixed(1);
+    t.append(im, mk("span", "", x.o.n), mk("b", "", (sign > 0 ? "+" : "−") + v + " п.п."));
+    t.title = `${x.o.n}: винрейт ${(x.wr * 100).toFixed(1)}% в ${x.g.toLocaleString("ru-RU")} играх`;
+    t.addEventListener("click", () => select(x.o.k, true));
+    return t;
+  }
+  function column(cls, title, sub, list, sign) {
+    const col = mk("section", "c-col " + cls);
+    col.append(mk("h3", "", title), mk("p", "", sub));
+    if (!list.length) { col.append(mk("p", "c-empty", "Явных матчапов по этому критерию нет.")); return col; }
+    split(list).forEach((t, i) => {
+      if (!t.items.length) return;
+      const tier = mk("div", "tier t" + (i + 1));
+      const h = mk("div", "tier-h"); h.append(mk("span", "", t.title), mk("span", "", String(t.items.length)));
+      const g = mk("div", "ctiles"); t.items.forEach(x => g.append(tile(x, sign)));
+      tier.append(h, g); col.append(tier);
+    });
+    return col;
+  }
+  function renderResult(h) {
+    const box = document.getElementById("cResult"); box.innerHTML = "";
+    const a = analyze(h);
+    const top = mk("div", "c-top");
+    const im = mk("img"); im.src = PORTRAIT[h.k] || ""; im.alt = h.n; im.width = 160; im.height = 90;
+    const info = mk("div", "c-info"); info.append(mk("h2", "", h.n));
+    const chips = mk("div", "chips");
+    chips.append(mk("span", "chip attr-" + h.a, ATTR[h.a]));
+    if (a.b) chips.append(mk("span", "chip", `Общий винрейт ${(a.b.wr * 100).toFixed(1)}%`));
+    info.append(chips);
+    top.append(im, info); box.append(top);
+    const cols = mk("div", "c-cols");
+    cols.append(
+      column("suffer", "Страдают от героя", `${h.n} играет против них лучше обычного.`, a.suffer, 1),
+      column("counter", "Хороши против героя", `Против них ${h.n} играет хуже обычного.`, a.counter, -1));
+    box.append(cols);
+    box.append(mk("p", "c-note", `Числа показывают, насколько винрейт в паре отличается от ожидаемого с учётом общей силы обоих героев (п.п. это процентные пункты). Данные: публичные матчи OpenDota за последние дни${typeof MATCHUP_INFO !== "undefined" ? ", " + MATCHUP_INFO : ""}. Пары с малым числом игр скрыты.`));
+  }
+  const grid = document.getElementById("cGrid");
+  function renderList() {
+    const q = query.trim().toLowerCase();
+    const list = heroes.filter(h => (attr === "all" || h.a === attr) && (!q || h.n.toLowerCase().includes(q)));
+    grid.innerHTML = "";
+    list.forEach(h => {
+      const b = mk("button", "tile"); b.type = "button"; b.setAttribute("role", "listitem");
+      b.setAttribute("aria-pressed", String(cur === h.k)); b.dataset.k = h.k; b.title = h.n;
+      const im = mk("img"); im.src = PORTRAIT[h.k] || ""; im.alt = ""; im.width = 128; im.height = 72; im.loading = "lazy";
+      b.append(im, mk("span", "", h.n));
+      b.addEventListener("click", () => select(h.k, true));
+      grid.append(b);
+    });
+    document.getElementById("cCount").textContent = list.length ? `Героев: ${list.length}` : "Никого не нашлось, попробуйте другое имя";
+  }
+  function select(k, push) {
+    const h = byKey[k]; if (!h) return;
+    cur = k; renderResult(h); renderList();
+    if (push) {
+      try { history.replaceState(null, "", "#c-" + k); localStorage.setItem("dc-hero", JSON.stringify(k)); } catch {}
+      if (window.matchMedia("(max-width: 880px)").matches) document.getElementById("cResult").scrollIntoView({ block: "start" });
+    }
+  }
+  document.getElementById("cSearch").addEventListener("input", e => { query = e.target.value; renderList(); });
+  document.getElementById("cAttrSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    attr = b.dataset.v;
+    document.querySelectorAll("#cAttrSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    renderList();
+  });
+  window.__selectCounterKey = k => select(k, false);
+  let start = "antimage";
+  try { const s = JSON.parse(localStorage.getItem("dc-hero") || '""'); if (byKey[s]) start = s; } catch {}
+  if ((location.hash || "").startsWith("#c-") && byKey[location.hash.slice(3)]) start = location.hash.slice(3);
+  select(byKey[start] ? start : heroes[0].k, false);
+})();
+</script>

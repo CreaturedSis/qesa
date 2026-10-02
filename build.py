@@ -71,24 +71,27 @@ def last_inline_script(text):
 
 
 def main():
-    index, guides, rnd = read("src/roulette.html"), read("src/guides.html"), read("src/random.html")
-    icons, gjs, heroes = read("icons.js"), read("guides.js"), read("heroes.js")
+    index, guides, rnd, cnt = read("src/roulette.html"), read("src/guides.html"), read("src/random.html"), read("src/counters.html")
+    icons, gjs, heroes, mu = read("icons.js"), read("guides.js"), read("heroes.js"), read("matchups.js")
 
     # --- стили ---
     css_r = between(index, "<style>", "</style>")
     css_g = between(guides, "<style>", "</style>")
     glob_r, scoped_r = scope_css(css_r, "viewRoulette", True)
-    _, scoped_g = scope_css(css_g, "viewGuides, #viewRandom", False)  # гайд на вкладке рандома оформляется теми же стилями
+    _, scoped_g = scope_css(css_g, "viewGuides, #viewRandom, #viewCounters", False)  # гайд на вкладке рандома оформляется теми же стилями
     css_x = between(rnd, "<style>", "</style>")
     _, scoped_x = scope_css(css_x, "viewRandom", False)
     html_x = between(rnd, "</style>\n", "<script>")
     js_x = between(rnd, "<script>\n", "</script>")
+    _, scoped_c = scope_css(between(cnt, "<style>", "</style>"), "viewCounters", False)
+    html_c = between(cnt, "</style>\n", "<script>")
+    js_c = between(cnt, "<script>\n", "</script>")
     extra = """
 .topnav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); margin-inline: -16px; padding: 10px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; }
 .nav-tab { font: inherit; cursor: pointer; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 8px 16px; font-weight: 700; }
 .nav-tab[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
 .nav-tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-#viewRoulette, #viewGuides, #viewRandom { padding-top: 20px; }
+#viewRoulette, #viewGuides, #viewRandom, #viewCounters { padding-top: 20px; }
 .linkbtn { background: none; border: 0; padding: 0; color: var(--gold); text-decoration: underline; cursor: pointer; font: inherit; text-align: left; }
 """
     # --- разметка ---
@@ -113,14 +116,14 @@ def main():
     js_g = js_g.replace('  document.getElementById("rand").addEventListener', '  window.__selectGuide = name => { const h = heroes.find(x => x.n === name); if (h) select(h.k, true); };\n  window.__selectGuideKey = k => { if (byKey[k]) select(k, false); };\n  window.__renderGuideInto = (h, target, pi, vi) => renderGuide(h, target, pi, vi);\n  document.getElementById("rand").addEventListener')
     assert "__selectGuide" in js_g
     nav_js = '''(() => {
-  const views = { roulette: document.getElementById("viewRoulette"), guides: document.getElementById("viewGuides"), random: document.getElementById("viewRandom") };
+  const views = { roulette: document.getElementById("viewRoulette"), guides: document.getElementById("viewGuides"), random: document.getElementById("viewRandom"), counters: document.getElementById("viewCounters") };
   const tabs = document.querySelectorAll(".nav-tab");
   function showView(v, top) {
     Object.entries(views).forEach(([k, el]) => { el.hidden = k !== v; });
     tabs.forEach(t => t.setAttribute("aria-pressed", String(t.dataset.view === v)));
     if (top) window.scrollTo(0, 0);
     if (v === "random" && window.__rollHeroFirst) window.__rollHeroFirst();
-    try { if (v === "roulette") history.replaceState(null, "", "#roulette"); else if (v === "random") history.replaceState(null, "", "#random"); else if (!location.hash.startsWith("#g-")) history.replaceState(null, "", "#guides"); } catch {}
+    try { if (v === "roulette") history.replaceState(null, "", "#roulette"); else if (v === "random") history.replaceState(null, "", "#random"); else if (v === "counters") { if (!location.hash.startsWith("#c-")) history.replaceState(null, "", "#counters"); } else if (!location.hash.startsWith("#g-")) history.replaceState(null, "", "#guides"); } catch {}
   }
   tabs.forEach(t => t.addEventListener("click", () => showView(t.dataset.view, true)));
   window.openGuideByName = name => { showView("guides", false); if (window.__selectGuide) window.__selectGuide(name); window.scrollTo(0, 0); };
@@ -129,12 +132,14 @@ def main():
     else if (location.hash === "#guides") showView("guides", false);
     else if (location.hash === "#roulette") showView("roulette", false);
     else if (location.hash === "#random") showView("random", false);
+    else if (location.hash.startsWith("#c-")) { showView("counters", false); if (window.__selectCounterKey) window.__selectCounterKey(location.hash.slice(3)); }
+    else if (location.hash === "#counters") showView("counters", false);
   });
-  showView(/^#(g-|guides)/.test(location.hash) ? "guides" : location.hash === "#random" ? "random" : "roulette", false);
+  showView(/^#(g-|guides)/.test(location.hash) ? "guides" : location.hash === "#random" ? "random" : /^#(c-|counters)/.test(location.hash) ? "counters" : "roulette", false);
 })();'''
     def compose(inline):
-        data = (f'<script>\n{icons}</script>\n<script>\n{gjs}</script>\n<script>\n{heroes}</script>\n' if inline
-                else '<script src="icons.js"></script>\n<script src="guides.js"></script>\n<script src="heroes.js"></script>\n')
+        data = (f'<script>\n{icons}</script>\n<script>\n{gjs}</script>\n<script>\n{heroes}</script>\n<script>\n{mu}</script>\n' if inline
+                else '<script src="icons.js"></script>\n<script src="guides.js"></script>\n<script src="heroes.js"></script>\n<script src="matchups.js"></script>\n')
         return f'''<title>Дота Рулетка</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -145,11 +150,13 @@ def main():
 {scoped_r}
 {scoped_g}
 {scoped_x}
+{scoped_c}
 </style>
 <nav class="topnav" aria-label="Разделы">
   <button type="button" class="nav-tab" data-view="roulette" aria-pressed="true">Рулетка героев</button>
   <button type="button" class="nav-tab" data-view="guides" aria-pressed="false">Гайды героев</button>
   <button type="button" class="nav-tab" data-view="random" aria-pressed="false">Рандом героя</button>
+  <button type="button" class="nav-tab" data-view="counters" aria-pressed="false">Контрпики</button>
 </nav>
 <div id="viewRoulette">
 {html_r}</div>
@@ -157,12 +164,16 @@ def main():
 {html_g}</div>
 <div id="viewRandom" hidden>
 {html_x}</div>
+<div id="viewCounters" hidden>
+{html_c}</div>
 {data}<script>
 {js_r}</script>
 <script>
 {js_g}</script>
 <script>
 {js_x}</script>
+<script>
+{js_c}</script>
 <script>
 {nav_js}
 </script>
