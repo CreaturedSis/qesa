@@ -71,7 +71,7 @@ def last_inline_script(text):
 
 
 def main():
-    index, guides = read("index.html"), read("guides.html")
+    index, guides = read("src/roulette.html"), read("src/guides.html")
     icons, gjs, heroes = read("icons.js"), read("guides.js"), read("heroes.js")
 
     # --- стили ---
@@ -126,7 +126,10 @@ def main():
   });
   showView(/^#(g-|guides)/.test(location.hash) ? "guides" : "roulette", false);
 })();'''
-    page = f'''<title>Дота Рулетка</title>
+    def compose(inline):
+        data = (f'<script>\n{icons}</script>\n<script>\n{gjs}</script>\n<script>\n{heroes}</script>\n' if inline
+                else '<script src="icons.js"></script>\n<script src="guides.js"></script>\n<script src="heroes.js"></script>\n')
+        return f'''<title>Дота Рулетка</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700;800&display=swap">
@@ -144,13 +147,7 @@ def main():
 {html_r}</div>
 <div id="viewGuides" hidden>
 {html_g}</div>
-<script>
-{icons}</script>
-<script>
-{gjs}</script>
-<script>
-{heroes}</script>
-<script>
+{data}<script>
 {js_r}</script>
 <script>
 {js_g}</script>
@@ -158,15 +155,22 @@ def main():
 {nav_js}
 </script>
 '''
+    def wrap(page, full):
+        if not full:
+            return page  # фрагмент: служебную обёртку добавляет сервис публикации
+        i = page.index('<nav class="topnav"')
+        return ('<!doctype html>\n<html lang="ru">\n<head>\n<meta charset="utf-8">\n'
+                '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+                + page[:i] + '</head>\n<body>\n' + page[i:] + '</body>\n</html>\n')
+
+    index_html = wrap(compose(False), True)
+    with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as f:
+        f.write(index_html)
     os.makedirs(os.path.join(ROOT, "dist"), exist_ok=True)
+    artifact = wrap(compose(True), False)
     with open(os.path.join(ROOT, "dist", "artifact.html"), "w", encoding="utf-8") as f:
-        f.write(page)  # фрагмент для публикации: обёртку добавляет сервис
-    full = ('<!doctype html>\n<html lang="ru">\n<head>\n<meta charset="utf-8">\n'
-            '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n</head>\n<body>\n'
-            + page + '</body>\n</html>\n')
-    with open(os.path.join(ROOT, "dist", "app.html"), "w", encoding="utf-8") as f:
-        f.write(full)  # полный документ для проверки в браузере
-    print("dist/artifact.html", len(page) // 1024, "KB")
+        f.write(artifact)
+    print("index.html", len(index_html) // 1024, "KB;", "dist/artifact.html", len(artifact) // 1024, "KB")
 
 
 if __name__ == "__main__":
