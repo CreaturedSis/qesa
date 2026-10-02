@@ -80,7 +80,8 @@ button:hover { border-color: var(--gold); }
 .stage { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 10px; padding-block: 10px; border-top: 1px solid var(--line); }
 @media (max-width: 560px) { .stage { grid-template-columns: minmax(0, 1fr); gap: 6px; } }
 .st-title b { display: block; font-family: var(--display); font-weight: 700; font-size: 1.02rem; }
-.st-title span { font-size: .78rem; color: var(--muted); }
+.st-title span { font-size: .78rem; color: var(--muted); display: block; }
+.st-title span.src { color: var(--gold); opacity: .85; }
 .st-items { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
 .it { display: grid; gap: 3px; justify-items: center; width: 70px; margin: 0; position: relative; }
 .it img { width: 60px; height: 44px; object-fit: cover; border-radius: 3px; border: 1px solid var(--line); background: var(--panel-2); }
@@ -160,7 +161,7 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
   </details>
 
   <footer>
-    <span>Сборки по стадиям это официальные рекомендации Valve из клиента игры (<a href="https://github.com/SteamDatabase/GameTracking-Dota2" target="_blank" rel="noopener">SteamDatabase/GameTracking-Dota2</a>), последний раз обновлённые к патчу 7.40. Предметы, удалённые в 7.41, я убрал, новых предметов в них нет. Актуальный патч на момент сборки страницы: 7.41f. Раздел «Гиперлейт» собран из самых дорогих предметов в их списке «по ситуации». Это общая сборка на героя, а не статистика под вашу позицию, поэтому для актуальной меты откройте ссылки на ProTracker и Dotabuff у героя.</span>
+    <span>Сборки по стадиям построены по недавним публичным матчам из <a href="https://www.opendota.com" target="_blank" rel="noopener">OpenDota</a>: показаны предметы, которые за героя покупали чаще всего (выборка небольшая и без деления на позиции). Списки «Ситуативные» и сборки героев без данных взяты из официальных рекомендаций Valve (<a href="https://github.com/SteamDatabase/GameTracking-Dota2" target="_blank" rel="noopener">SteamDatabase/GameTracking-Dota2</a>, к патчу 7.40). Предметы, удалённые в 7.41, я убрал. Актуальный патч на момент сборки: 7.41f. Раздел «Гиперлейт» собран из самых дорогих предметов в их списке «по ситуации». Это общая сборка на героя, а не статистика под вашу позицию, поэтому для актуальной меты откройте ссылки на ProTracker и Dotabuff у героя.</span>
     <span>Способности и таланты: <a href="https://github.com/odota/dotaconstants" target="_blank" rel="noopener">odota/dotaconstants</a>. Иконки: <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, изображения принадлежат Valve Corporation. Порядок прокачки составлен вручную для 91 героя, выбор талантов подобран по роли и носит рекомендательный характер.</span>
   </footer>
 </div>
@@ -229,6 +230,11 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
     chips.append(mk("span", "chip attr-" + h.a, ATTR[h.a]), mk("span", "chip", h.t === "Melee" ? "Ближний бой" : "Дальний бой"));
     h.r.forEach(r => chips.append(mk("span", "chip", r)));
     if (h.pos) chips.append(mk("span", "chip", "Основная позиция: " + h.pos));
+    if (h.ln) {
+      const LN = { s: "изи лайн", m: "мид", o: "хард лайн", j: "лес" };
+      const top = Object.entries(h.ln).sort((a, b) => b[1] - a[1]).filter(x => x[1] >= 10).slice(0, 2);
+      if (top.length) chips.append(mk("span", "chip", "Чаще всего: " + top.map(([k, v]) => `${LN[k]} ${v}%`).join(", ")));
+    }
     chips.append(mk("span", "chip", `Дальность атаки ${h.rg}`), mk("span", "chip", `Скорость ${h.ms}`));
     t.append(chips);
     const live = mk("div", "live");
@@ -246,11 +252,14 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
         const list = h.b[k] || [];
         if (!list.length) return;
         const row = mk("div", "stage"), tt = mk("div", "st-title"), its = mk("div", "st-items");
+        const sr = h.bs && h.bs[k] === "od" ? "по матчам OpenDota" : (list.length ? "рекомендация Valve" : "");
         tt.append(mk("b", "", title), mk("span", "", time));
+        if (k !== "o" && sr) tt.append(mk("span", "src", sr));
         list.forEach(e => its.append(itemFig(e)));
         row.append(tt, its); st.append(row);
       });
       is.append(st);
+      is.append(mk("p", "note", "Старт, ранняя игра, мид, лейт и гиперлейт показывают, что чаще всего покупали за этого героя в недавних публичных матчах OpenDota (компоненты не показаны). Это общая статистика по герою без деления на позиции. «Ситуативные» это рекомендации Valve."));
     } else {
       is.append(mk("p", "note", "У этого героя пока нет официальной сборки. Откройте ProTracker или Dotabuff выше."));
     }
