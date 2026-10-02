@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=Fira+Sans:wght@400;500;700&display=swap">
 <style>
-/* Layout: две карточки игроков бок о бок (Radiant слева, Dire справа), под ними общий челлендж дуэта и история бросков. Тёмная «каменная» гамма по выбору, одна тема. */
+/* Layout: две карточки игроков одной команды бок о бок, под ними общий челлендж дуэта и история бросков. Тёмная «каменная» гамма по выбору, одна тема. */
 :root {
   --bg: #0b0d10;
   --panel: #14171c;
@@ -697,8 +697,8 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
 
   const settings = { mode: "smart", attr: "any", chaos: 2, pos: "hero", heroes: "combo", ctype: "any", lane: "any", style: store.get("dr-style", "fun") === "pro" ? "pro" : "fun" };
   const players = [
-    { side: "radiant", tag: "Radiant", name: store.get("dr-name-0", "Нурбек"), locked: false, hero: null, roll: null },
-    { side: "dire", tag: "Dire", name: store.get("dr-name-1", "Друг"), locked: false, hero: null, roll: null },
+    { side: "radiant", tag: "Игрок 1", name: store.get("dr-name-0", "Нурбек"), locked: false, hero: null, roll: null },
+    { side: "radiant", tag: "Игрок 2", name: store.get("dr-name-1", "Друг"), locked: false, hero: null, roll: null },
   ];
   let duoText = "";
   let current = null; // { combo, swap }: swap=true значит герой b достаётся первому игроку

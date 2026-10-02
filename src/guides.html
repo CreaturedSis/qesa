@@ -234,9 +234,9 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
     return f;
   }
 
-  function renderPro(h, box) {
+  function renderPro(h, box, pi0, vi0) {
     const wrap = mk("div", "pro-wrap"); box.append(wrap);
-    let pi = 0, vi = 0;
+    let pi = pi0 || 0, vi = vi0 || 0;
     const draw = () => {
       wrap.innerHTML = "";
       const P = h.pd[pi], V = P.v[Math.min(vi, P.v.length - 1)];
@@ -324,8 +324,8 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
 
   function slug(n) { return n.toLowerCase().replace(/'/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
 
-  function renderGuide(h) {
-    const box = document.getElementById("guide");
+  function renderGuide(h, target, pi0, vi0) {
+    const box = target || document.getElementById("guide");
     box.innerHTML = "";
     // шапка
     const head = mk("div", "g-head");
@@ -349,7 +349,7 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
     live.append(pt, db, mk("small", "", "Живая статистика матчей по ролям"));
     t.append(live);
     head.append(im, t); box.append(head);
-    if (h.pd && h.pd.length) { renderPro(h, box); return; }
+    if (h.pd && h.pd.length) { renderPro(h, box, pi0, vi0); return; }
 
     // предметы
     const is = mk("section", "sec"); is.append(mk("h3", "", "Предметы по стадиям"));

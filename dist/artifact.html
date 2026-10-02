@@ -34,7 +34,7 @@ body {
 .nav-tab { font: inherit; cursor: pointer; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 8px 16px; font-weight: 700; }
 .nav-tab[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
 .nav-tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-#viewRoulette, #viewGuides { padding-top: 20px; }
+#viewRoulette, #viewGuides, #viewRandom { padding-top: 20px; }
 .linkbtn { background: none; border: 0; padding: 0; color: var(--gold); text-decoration: underline; cursor: pointer; font: inherit; text-align: left; }
 
 #viewRoulette {
@@ -207,7 +207,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
 .duel.combo-mode [data-act="lock"] { display: none; }
 @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
 }
-#viewGuides {
+#viewGuides, #viewRandom {
 .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
 header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
 h1 { font-family: var(--display); font-weight: 400; margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1; text-wrap: balance; }
@@ -306,10 +306,31 @@ details.changes summary { cursor: pointer; font-family: var(--display); font-wei
 footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 }
+#viewRandom {
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+.r-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.r-head h1 { font-family: var(--display); font-weight: 400; margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1; text-wrap: balance; }
+.r-head h1 span { color: var(--gold); }
+.r-head p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+.btn-main { font: inherit; cursor: pointer; background: var(--gold); color: var(--on-gold); border: 1px solid var(--gold); border-radius: 4px; padding: 10px 22px; font-family: var(--display); font-weight: 400; font-size: 1.15rem; letter-spacing: .03em; }
+.btn-main:hover { filter: brightness(1.08); }
+.btn-main:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.r-controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.r-controls .field { display: grid; gap: 4px; }
+.r-controls .eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 700; }
+.r-pick { display: grid; gap: 4px; padding: 14px 16px; background: var(--panel); border: 1px solid #5a4624; border-radius: 6px; }
+.r-pick .eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 700; }
+.r-pick .r-name { font-family: var(--display); font-weight: 400; font-size: clamp(1.8rem, 4.2vw, 2.6rem); line-height: 1.1; text-wrap: balance; min-height: 1.1em; }
+.r-pick .r-name.spinning { color: var(--muted); }
+.r-pick .r-meta { color: var(--muted); }
+.r-pick .r-meta b { color: var(--gold); font-weight: 500; }
+.r-actions { display: flex; justify-content: center; padding-block: 8px; }
+}
 </style>
 <nav class="topnav" aria-label="Разделы">
   <button type="button" class="nav-tab" data-view="roulette" aria-pressed="true">Рулетка героев</button>
   <button type="button" class="nav-tab" data-view="guides" aria-pressed="false">Гайды героев</button>
+  <button type="button" class="nav-tab" data-view="random" aria-pressed="false">Рандом героя</button>
 </nav>
 <div id="viewRoulette">
 <div class="wrap fun-mode" id="wrap">
@@ -500,6 +521,53 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
       <div class="newitems" id="newItems"></div>
     </div>
   </details>
+</div>
+</div>
+<div id="viewRandom" hidden>
+<div class="wrap">
+  <header class="r-head">
+    <div>
+      <h1>Рандом <span>героя</span></h1>
+      <p>Нажми на кнопку и получишь случайного героя с позицией и билдом на него: предметы по стадиям, прокачка и таланты.</p>
+    </div>
+    <button type="button" class="btn-main" id="rAgainTop">Выбрать героя</button>
+  </header>
+
+  <div class="r-controls">
+    <div class="field">
+      <span class="eyebrow" id="rAttrLbl">Атрибут</span>
+      <div class="seg" role="group" aria-labelledby="rAttrLbl" id="rAttrSeg">
+        <button type="button" data-v="all" aria-pressed="true">Любой</button>
+        <button type="button" data-v="str" aria-pressed="false">Сила</button>
+        <button type="button" data-v="agi" aria-pressed="false">Ловкость</button>
+        <button type="button" data-v="int" aria-pressed="false">Интеллект</button>
+        <button type="button" data-v="uni" aria-pressed="false">Универсал</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="eyebrow" id="rPosLbl">Позиция</span>
+      <div class="seg" role="group" aria-labelledby="rPosLbl" id="rPosSeg">
+        <button type="button" data-v="0" aria-pressed="true">Любая</button>
+        <button type="button" data-v="1" aria-pressed="false">1</button>
+        <button type="button" data-v="2" aria-pressed="false">2</button>
+        <button type="button" data-v="3" aria-pressed="false">3</button>
+        <button type="button" data-v="4" aria-pressed="false">4</button>
+        <button type="button" data-v="5" aria-pressed="false">5</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="r-pick" id="rPick" aria-live="polite">
+    <span class="eyebrow" id="rCount">Бросок</span>
+    <div class="r-name" id="rName">…</div>
+    <div class="r-meta" id="rMeta"></div>
+  </section>
+
+  <main class="guide" id="rGuide"></main>
+
+  <div class="r-actions">
+    <button type="button" class="btn-main" id="rAgain">Крутить ещё раз</button>
+  </div>
 </div>
 </div>
 <script>
@@ -846,8 +914,8 @@ const IT_ICON = {"soul_ring":"data:image/webp;base64,UklGRgIFAABXRUJQVlA4IPYEAAA
 
   const settings = { mode: "smart", attr: "any", chaos: 2, pos: "hero", heroes: "combo", ctype: "any", lane: "any", style: store.get("dr-style", "fun") === "pro" ? "pro" : "fun" };
   const players = [
-    { side: "radiant", tag: "Radiant", name: store.get("dr-name-0", "Нурбек"), locked: false, hero: null, roll: null },
-    { side: "dire", tag: "Dire", name: store.get("dr-name-1", "Друг"), locked: false, hero: null, roll: null },
+    { side: "radiant", tag: "Игрок 1", name: store.get("dr-name-0", "Нурбек"), locked: false, hero: null, roll: null },
+    { side: "radiant", tag: "Игрок 2", name: store.get("dr-name-1", "Друг"), locked: false, hero: null, roll: null },
   ];
   let duoText = "";
   let current = null; // { combo, swap }: swap=true значит герой b достаётся первому игроку
@@ -1383,9 +1451,9 @@ const IT_ICON = {"soul_ring":"data:image/webp;base64,UklGRgIFAABXRUJQVlA4IPYEAAA
     return f;
   }
 
-  function renderPro(h, box) {
+  function renderPro(h, box, pi0, vi0) {
     const wrap = mk("div", "pro-wrap"); box.append(wrap);
-    let pi = 0, vi = 0;
+    let pi = pi0 || 0, vi = vi0 || 0;
     const draw = () => {
       wrap.innerHTML = "";
       const P = h.pd[pi], V = P.v[Math.min(vi, P.v.length - 1)];
@@ -1473,8 +1541,8 @@ const IT_ICON = {"soul_ring":"data:image/webp;base64,UklGRgIFAABXRUJQVlA4IPYEAAA
 
   function slug(n) { return n.toLowerCase().replace(/'/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
 
-  function renderGuide(h) {
-    const box = document.getElementById("guide");
+  function renderGuide(h, target, pi0, vi0) {
+    const box = target || document.getElementById("guide");
     box.innerHTML = "";
     // шапка
     const head = mk("div", "g-head");
@@ -1498,7 +1566,7 @@ const IT_ICON = {"soul_ring":"data:image/webp;base64,UklGRgIFAABXRUJQVlA4IPYEAAA
     live.append(pt, db, mk("small", "", "Живая статистика матчей по ролям"));
     t.append(live);
     head.append(im, t); box.append(head);
-    if (h.pd && h.pd.length) { renderPro(h, box); return; }
+    if (h.pd && h.pd.length) { renderPro(h, box, pi0, vi0); return; }
 
     // предметы
     const is = mk("section", "sec"); is.append(mk("h3", "", "Предметы по стадиям"));
@@ -1581,6 +1649,7 @@ const IT_ICON = {"soul_ring":"data:image/webp;base64,UklGRgIFAABXRUJQVlA4IPYEAAA
   });
   window.__selectGuide = name => { const h = heroes.find(x => x.n === name); if (h) select(h.k, true); };
   window.__selectGuideKey = k => { if (byKey[k]) select(k, false); };
+  window.__renderGuideInto = (h, target, pi, vi) => renderGuide(h, target, pi, vi);
   document.getElementById("rand").addEventListener("click", () => select(heroes[Math.floor(Math.random() * heroes.length)].k, true));
 
   const fromHash = (location.hash || "").startsWith("#g-") ? location.hash.slice(3) : "";
@@ -1590,13 +1659,84 @@ const IT_ICON = {"soul_ring":"data:image/webp;base64,UklGRgIFAABXRUJQVlA4IPYEAAA
 </script>
 <script>
 (() => {
-  const views = { roulette: document.getElementById("viewRoulette"), guides: document.getElementById("viewGuides") };
+  const heroes = HERO_DB.filter(h => h.pd && h.pd.length);
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  let attr = "all", pos = 0, count = 0, last = null, busy = false;
+
+  function candidates() {
+    return heroes.filter(h => (attr === "all" || h.a === attr) && (!pos || h.pd.some(p => p.p === pos)) && h.k !== last);
+  }
+  function choose() {
+    let list = candidates();
+    if (!list.length) list = heroes.filter(h => (attr === "all" || h.a === attr) && (!pos || h.pd.some(p => p.p === pos)));
+    if (!list.length) return null;
+    const h = pick(list);
+    let pi;
+    if (pos) pi = h.pd.findIndex(p => p.p === pos);
+    else {
+      // позиция с весом по числу игр, чтобы выпадали реальные роли героя
+      const total = h.pd.reduce((s, p) => s + p.n, 0); let r = Math.random() * total; pi = 0;
+      for (let i = 0; i < h.pd.length; i++) { r -= h.pd[i].n; if (r <= 0) { pi = i; break; } }
+    }
+    const vi = Math.floor(Math.random() * h.pd[pi].v.length);
+    return { h, pi, vi };
+  }
+  function show(r) {
+    const { h, pi, vi } = r, P = h.pd[pi], V = P.v[vi];
+    const nameEl = document.getElementById("rName");
+    nameEl.classList.remove("spinning");
+    nameEl.textContent = h.n;
+    const meta = document.getElementById("rMeta");
+    meta.innerHTML = "";
+    const add = (t, strong) => { if (strong) { const b = document.createElement("b"); b.textContent = t; meta.append(b); } else meta.append(document.createTextNode(t)); };
+    add("Позиция "); add(String(P.p), true); add(" · билд "); add("«" + V.l + "»", true);
+    if (V.d) add(": " + V.d);
+    window.__renderGuideInto(h, document.getElementById("rGuide"), pi, vi);
+    last = h.k;
+  }
+  function roll() {
+    if (busy) return;
+    const r = choose();
+    if (!r) { document.getElementById("rName").textContent = "Таких героев нет"; document.getElementById("rMeta").textContent = "Попробуйте другое сочетание атрибута и позиции."; document.getElementById("rGuide").innerHTML = ""; return; }
+    count++;
+    document.getElementById("rCount").textContent = "Бросок №" + count;
+    const nameEl = document.getElementById("rName");
+    const done = () => { busy = false; show(r); const el = document.getElementById("rPick"); if (count > 1) el.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" }); };
+    if (reduceMotion) return done();
+    busy = true; nameEl.classList.add("spinning");
+    let t = 0;
+    const timer = setInterval(() => {
+      nameEl.textContent = pick(heroes).n;
+      if (++t >= 12) { clearInterval(timer); done(); }
+    }, 55);
+  }
+  function seg(id, set) {
+    const box = document.getElementById(id);
+    box.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return;
+      box.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      set(b.dataset.v); roll();
+    });
+  }
+  seg("rAttrSeg", v => { attr = v; });
+  seg("rPosSeg", v => { pos = Number(v); });
+  document.getElementById("rAgain").addEventListener("click", roll);
+  document.getElementById("rAgainTop").addEventListener("click", roll);
+  window.__rollHero = roll;
+  window.__rollHeroFirst = () => { if (!count) roll(); };
+})();
+</script>
+<script>
+(() => {
+  const views = { roulette: document.getElementById("viewRoulette"), guides: document.getElementById("viewGuides"), random: document.getElementById("viewRandom") };
   const tabs = document.querySelectorAll(".nav-tab");
   function showView(v, top) {
     Object.entries(views).forEach(([k, el]) => { el.hidden = k !== v; });
     tabs.forEach(t => t.setAttribute("aria-pressed", String(t.dataset.view === v)));
     if (top) window.scrollTo(0, 0);
-    try { if (v === "roulette") history.replaceState(null, "", "#roulette"); else if (!location.hash.startsWith("#g-")) history.replaceState(null, "", "#guides"); } catch {}
+    if (v === "random" && window.__rollHeroFirst) window.__rollHeroFirst();
+    try { if (v === "roulette") history.replaceState(null, "", "#roulette"); else if (v === "random") history.replaceState(null, "", "#random"); else if (!location.hash.startsWith("#g-")) history.replaceState(null, "", "#guides"); } catch {}
   }
   tabs.forEach(t => t.addEventListener("click", () => showView(t.dataset.view, true)));
   window.openGuideByName = name => { showView("guides", false); if (window.__selectGuide) window.__selectGuide(name); window.scrollTo(0, 0); };
@@ -1604,7 +1744,8 @@ const IT_ICON = {"soul_ring":"data:image/webp;base64,UklGRgIFAABXRUJQVlA4IPYEAAA
     if (location.hash.startsWith("#g-")) { showView("guides", false); if (window.__selectGuideKey) window.__selectGuideKey(location.hash.slice(3)); }
     else if (location.hash === "#guides") showView("guides", false);
     else if (location.hash === "#roulette") showView("roulette", false);
+    else if (location.hash === "#random") showView("random", false);
   });
-  showView(/^#(g-|guides)/.test(location.hash) ? "guides" : "roulette", false);
+  showView(/^#(g-|guides)/.test(location.hash) ? "guides" : location.hash === "#random" ? "random" : "roulette", false);
 })();
 </script>
