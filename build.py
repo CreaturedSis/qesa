@@ -82,7 +82,7 @@ def main():
     extra = """
 .topnav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); margin-inline: -16px; padding: 10px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; }
 .nav-tab { font: inherit; cursor: pointer; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 8px 16px; font-weight: 700; }
-.nav-tab[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: #1a140c; }
+.nav-tab[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
 .nav-tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 #viewRoulette, #viewGuides { padding-top: 20px; }
 .linkbtn { background: none; border: 0; padding: 0; color: var(--gold); text-decoration: underline; cursor: pointer; font: inherit; text-align: left; }
@@ -132,7 +132,7 @@ def main():
         return f'''<title>Дота Рулетка</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=Fira+Sans:wght@400;500;700&display=swap">
 <style>
 {glob_r}
 {extra}
