@@ -6,7 +6,7 @@
 <title>Дота Рулетка</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700;800&display=swap">
 <style>
 /* Layout: две карточки игроков бок о бок (Radiant слева, Dire справа), под ними общий челлендж дуэта и история бросков. Тёмная «каменная» гамма по выбору, одна тема. */
 :root {
@@ -20,8 +20,8 @@
   --radiant: #63b48d;
   --dire: #c9513f;
   --troll: #b07ad9;
-  --display: "Alegreya SC", "Palatino Linotype", Georgia, serif;
-  --body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  --display: "Radiance", "Fira Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "Radiance", "Fira Sans", "Segoe UI", system-ui, sans-serif;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -72,6 +72,9 @@ button:hover { border-color: var(--gold); }
 }
 .btn-main:hover { filter: brightness(1.08); }
 .spacer { flex: 1 1 auto; }
+.head-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.btn-link { display: inline-block; text-decoration: none; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 10px 14px; font-weight: 500; }
+.btn-link:hover { border-color: var(--gold); }
 
 .duel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 780px) { .duel { grid-template-columns: 1fr; } }
@@ -188,7 +191,8 @@ ol.build li.t-troll .kind { color: var(--troll); }
 .st-title b { display: block; font-family: var(--display); font-size: 1.02rem; }
 .st-title span { font-size: .78rem; color: var(--muted); }
 .st-items { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
-.it { display: grid; gap: 3px; justify-items: center; width: 66px; margin: 0; }
+.it { display: grid; gap: 3px; justify-items: center; width: 66px; margin: 0; position: relative; }
+.it .cnt { position: absolute; top: -4px; right: 1px; background: var(--gold); color: #1a140c; font-size: .68rem; font-weight: 700; padding: 0 5px; border-radius: 999px; }
 .it img { width: 56px; height: 41px; object-fit: cover; border-radius: 3px; border: 1px solid var(--line); background: var(--panel-2); }
 .it figcaption { font-size: .68rem; line-height: 1.15; text-align: center; color: var(--muted); overflow-wrap: anywhere; }
 footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
@@ -223,7 +227,10 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
       <h1>Дота <span>Рулетка</span></h1>
       <p>Герои и связки для двоих на одной линии. В стиле «Фан» сборки с челленджами для смеха, в стиле «Серьёзно» гайды по героям с прокачкой, талантами и предметами по стадиям.</p>
     </div>
-    <button class="btn-main" id="rollAll" type="button">Крутить обоих</button>
+    <div class="head-actions">
+      <a class="btn-link" href="https://claude.ai/artifact/8oUD5M1GQUN3oDckT6XB3c" target="_blank" rel="noopener">Гайды героев</a>
+      <button class="btn-main" id="rollAll" type="button">Крутить обоих</button>
+    </div>
   </header>
 
   <div class="controls">
@@ -331,7 +338,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
   </section>
 
   <footer>
-    <span class="pro-only">Гайды в стиле «Серьёзно» составлены вручную по актуальной мете и оформлены по образцу dota2protracker, но это не выгрузка с сайта: он недоступен из среды, где собиралась страница. Таланты подобраны автоматически по роли героя. Перед игрой сверяйтесь с живой статистикой на <a href="https://dota2protracker.com" target="_blank" rel="noopener">dota2protracker.com</a>.</span>
+    <span class="pro-only">Сборки по стадиям взяты из официальных сборок Valve в клиенте игры (обновлены с патчем 7.40). Это общая рекомендация, а не статистика матчей: актуальные сборки под вашу роль смотрите на <a href="https://dota2protracker.com" target="_blank" rel="noopener">dota2protracker.com</a>. Порядок прокачки составлен вручную, выбор талантов подобран по роли героя.</span>
     <span>Иконки героев и предметов взяты из открытого репозитория <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, сами изображения принадлежат Valve Corporation.</span>
     <span>Связки с пометкой «из обзоров» взяты из этих материалов, остальные это известная классика. Патчи меняют героев, поэтому перед катками загляни в актуальные изменения.</span>
     <ul>
@@ -851,17 +858,19 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
 
   // ── Гайд героя ───────────────────────────────────────────────────
   const STAGES = [
-    ["st", "Старт", "до 0:00, закуп на линию"],
+    ["s", "Старт", "до 0:00, закуп на линию"],
     ["e", "Ранняя игра", "лайнинг, до ~12 минуты"],
     ["m", "Мид-гейм", "~12–25 минута, основные предметы"],
     ["l", "Лейт", "~25–40 минута"],
-    ["h", "Гиперлейт", "40+ минута, слоты заполнены"],
+    ["h", "Гиперлейт", "40+ минута, самые дорогие слоты"],
+    ["o", "Ситуативные", "по обстановке в игре"],
   ];
   const mk = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
-  function itemFig(n) {
+  function itemFig(e) {
     const f = mk("figure", "it");
-    const im = mk("img"); im.src = ITEM_ICON[n] || ""; im.alt = ""; im.width = 56; im.height = 41;
-    f.append(im, mk("figcaption", "", n));
+    const im = mk("img"); im.src = ITEM_ICON[e[0]] || ""; im.alt = ""; im.width = 56; im.height = 41;
+    f.append(im, mk("figcaption", "", e[0]));
+    if (e[1] > 1) f.append(mk("span", "cnt", "×" + e[1]));
     return f;
   }
   function renderGuide(idx) {
@@ -904,9 +913,11 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     const is = mk("section", "g-sec"); is.append(mk("h3", "", "Предметы по стадиям"));
     const st = mk("div", "stages");
     STAGES.forEach(([k, title, time]) => {
+      const list = (g.b && g.b[k]) || [];
+      if (!list.length) return;
       const row = mk("div", "stage"), tt = mk("div", "st-title"), its = mk("div", "st-items");
       tt.append(mk("b", "", title), mk("span", "", time));
-      g[k].forEach(n => its.append(itemFig(n)));
+      list.forEach(e => its.append(itemFig(e)));
       row.append(tt, its); st.append(row);
     });
     is.append(st); box.append(is);
@@ -1081,7 +1092,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
         const order = [];
         g.sk.split("").forEach((c, i) => { if ("qwer".includes(c) && i < 18) order.push(c.toUpperCase()); });
         lines.push(`Прокачка (1-18): ${g.sk.slice(0, 18).split("").map(c => c === "t" ? "T" : c === "a" ? "+" : c.toUpperCase()).join(" ")}`, `Q ${g.ab.q.n} · W ${g.ab.w.n} · E ${g.ab.e.n} · R ${g.ab.r.n}`);
-        STAGES.forEach(([k, title]) => lines.push(`${title}: ${g[k].join(" → ")}`));
+        STAGES.forEach(([k, title]) => { const l = (g.b && g.b[k]) || []; if (l.length) lines.push(`${title}: ${l.map(e => e[1] > 1 ? `${e[0]} ×${e[1]}` : e[0]).join(" → ")}`); });
       } else {
         lines.push(`Сборка «${r.build.title}»: ${r.build.items.map(i => i.n).join(" → ")}`);
         r.rules.forEach(x => lines.push(`• ${strip(x)}`));

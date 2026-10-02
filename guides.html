@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Гайды героев Dota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: слева список героев с поиском, справа гайд выбранного героя. Тёмная каменная гамма, одна тема. */
+:root {
+  --bg: #15120f;
+  --panel: #1f1a16;
+  --panel-2: #29221c;
+  --line: #3a3027;
+  --ink: #efe6d6;
+  --muted: #a8998a;
+  --gold: #d9a94e;
+  --radiant: #63b48d;
+  --dire: #c9513f;
+  --troll: #b07ad9;
+  --display: "Radiance", "Fira Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "Radiance", "Fira Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); padding-inline: 16px; padding-block: 24px 48px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+h1 { font-family: var(--display); font-weight: 800; margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1; text-wrap: balance; }
+h1 span { color: var(--gold); }
+.sub { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+a { color: var(--gold); }
+button, input { font: inherit; }
+button { cursor: pointer; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 7px 12px; font-weight: 500; }
+button:hover { border-color: var(--gold); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.btn-link { display: inline-block; text-decoration: none; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 7px 12px; font-weight: 500; }
+.btn-link:hover { border-color: var(--gold); }
+.btn-gold { background: var(--gold); color: #1a140c; border-color: var(--gold); font-weight: 700; }
+
+.layout { display: grid; grid-template-columns: minmax(260px, 360px) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 880px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+.picker { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px; display: grid; gap: 10px; position: sticky; top: calc(8px + env(safe-area-inset-top, 0px)); }
+@media (max-width: 880px) { .picker { position: static; } }
+.search { width: 100%; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; }
+.seg { display: flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; background: var(--panel-2); color: var(--muted); padding: 6px 10px; flex: 1 1 auto; }
+.seg button[aria-pressed="true"] { background: var(--gold); color: #1a140c; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 6px; max-height: 62vh; overflow-y: auto; padding-right: 4px; }
+@media (max-width: 880px) { .grid { max-height: 300px; } }
+.tile { display: grid; gap: 3px; padding: 4px; border: 1px solid transparent; border-radius: 4px; background: var(--panel-2); text-align: center; font-size: .72rem; line-height: 1.15; color: var(--muted); min-width: 0; }
+.tile img { width: 100%; aspect-ratio: 128 / 72; object-fit: cover; border-radius: 3px; display: block; }
+.tile span { overflow-wrap: anywhere; }
+.tile[aria-pressed="true"] { border-color: var(--gold); color: var(--ink); }
+.count { color: var(--muted); font-size: .8rem; }
+
+.guide { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 18px; min-width: 0; }
+.g-head { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.g-head img { width: 192px; height: 108px; max-width: 100%; border-radius: 4px; border: 1px solid var(--line); object-fit: cover; }
+.g-title { display: grid; gap: 8px; min-width: 0; flex: 1 1 240px; }
+.g-title h2 { font-family: var(--display); font-weight: 800; margin: 0; font-size: clamp(1.8rem, 4.2vw, 2.6rem); line-height: 1.05; text-wrap: balance; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: .78rem; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--panel-2); }
+.chip.attr-str { color: #e0715d; border-color: #6a3329; }
+.chip.attr-agi { color: #7cc79a; border-color: #2f5a40; }
+.chip.attr-int { color: #6fa8e0; border-color: #2c4a6a; }
+.chip.attr-uni { color: var(--gold); border-color: #6a5326; }
+.live { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.live small { color: var(--muted); }
+
+.sec { display: grid; gap: 8px; min-width: 0; }
+.sec h3 { font-family: var(--display); font-weight: 800; font-size: 1.15rem; margin: 0; color: var(--gold); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.sec h3 small { font-family: var(--body); font-size: .78rem; color: var(--muted); font-weight: 400; }
+.note { margin: 0; font-size: .85rem; color: var(--muted); }
+.stages { display: grid; }
+.stage { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 10px; padding-block: 10px; border-top: 1px solid var(--line); }
+@media (max-width: 560px) { .stage { grid-template-columns: minmax(0, 1fr); gap: 6px; } }
+.st-title b { display: block; font-family: var(--display); font-weight: 700; font-size: 1.02rem; }
+.st-title span { font-size: .78rem; color: var(--muted); }
+.st-items { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.it { display: grid; gap: 3px; justify-items: center; width: 70px; margin: 0; position: relative; }
+.it img { width: 60px; height: 44px; object-fit: cover; border-radius: 3px; border: 1px solid var(--line); background: var(--panel-2); }
+.it figcaption { font-size: .68rem; line-height: 1.15; text-align: center; color: var(--muted); overflow-wrap: anywhere; }
+.it .cnt { position: absolute; top: -4px; right: 3px; background: var(--gold); color: #1a140c; font-size: .68rem; font-weight: 700; padding: 0 5px; border-radius: 999px; }
+
+.skills-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--panel-2); }
+.skills { display: grid; grid-template-columns: 160px repeat(25, 26px); width: max-content; }
+.skills > * { height: 30px; display: flex; align-items: center; justify-content: center; font-size: .72rem; color: var(--muted); border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.skills .lab { justify-content: flex-start; gap: 6px; padding-inline: 6px; position: sticky; left: 0; z-index: 1; background: var(--panel-2); color: var(--ink); font-size: .8rem; border-right: 1px solid var(--line); overflow: hidden; white-space: nowrap; }
+.skills .lab span { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.skills .lab img { width: 22px; height: 22px; border-radius: 3px; flex: none; }
+.skills .lv { background: var(--panel); }
+.skills .on::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--gold); }
+.skills .ult.on::before { background: var(--dire); }
+.skills .tl.on::before { border-radius: 3px; background: var(--troll); }
+.skills .last { border-bottom: 0; }
+.abil { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px; }
+.abil div { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: var(--panel-2); border-radius: 4px; font-size: .88rem; min-width: 0; }
+.abil img { width: 30px; height: 30px; border-radius: 3px; flex: none; }
+.abil small { color: var(--muted); }
+.tal { display: grid; gap: 6px; }
+.tal-row { display: grid; grid-template-columns: minmax(0, 1fr) 36px minmax(0, 1fr); gap: 6px; align-items: stretch; }
+.tal-opt { padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; font-size: .82rem; color: var(--muted); line-height: 1.3; overflow-wrap: anywhere; }
+.tal-opt.pick { border-color: var(--gold); color: var(--ink); background: var(--panel-2); }
+.tal-lv { align-self: center; justify-self: center; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--panel-2); color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Гайды <span>героев</span></h1>
+      <p class="sub">Выбери героя и получишь сборку по стадиям от старта до гиперлейта, прокачку способностей и таланты.</p>
+    </div>
+    <div class="live">
+      <button type="button" id="rand" class="btn-gold">Случайный герой</button>
+      <a class="btn-link" id="back" href="https://claude.ai/artifact/FP27szDazAJYegmwg55L9L" target="_blank" rel="noopener">Рулетка героев</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="picker" aria-label="Выбор героя">
+      <input id="q" class="search" type="search" placeholder="Найти героя" autocomplete="off" aria-label="Поиск героя">
+      <div class="seg" role="group" aria-label="Атрибут" id="attrSeg">
+        <button type="button" data-v="all" aria-pressed="true">Все</button>
+        <button type="button" data-v="str" aria-pressed="false">Сила</button>
+        <button type="button" data-v="agi" aria-pressed="false">Ловкость</button>
+        <button type="button" data-v="int" aria-pressed="false">Интеллект</button>
+        <button type="button" data-v="uni" aria-pressed="false">Универсал</button>
+      </div>
+      <div class="count" id="count"></div>
+      <div class="grid" id="grid" role="list"></div>
+    </aside>
+    <main class="guide" id="guide" aria-live="polite"></main>
+  </div>
+
+  <footer>
+    <span>Сборки по стадиям это официальные рекомендации Valve из клиента игры (<a href="https://github.com/SteamDatabase/GameTracking-Dota2" target="_blank" rel="noopener">SteamDatabase/GameTracking-Dota2</a>), последний раз обновлённые с патчем 7.40. Раздел «Гиперлейт» собран из самых дорогих предметов в их списке «по ситуации». Это общая сборка на героя, а не статистика под вашу позицию, поэтому для актуальной меты откройте ссылки на ProTracker и Dotabuff у героя.</span>
+    <span>Способности и таланты: <a href="https://github.com/odota/dotaconstants" target="_blank" rel="noopener">odota/dotaconstants</a>. Иконки: <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, изображения принадлежат Valve Corporation. Порядок прокачки составлен вручную для 91 героя, выбор талантов подобран по роли и носит рекомендательный характер.</span>
+  </footer>
+</div>
+<script src="heroes.js"></script>
+<script>
+(() => {
+  const ATTR = { str: "Сила", agi: "Ловкость", int: "Интеллект", uni: "Универсал" };
+  const STAGES = [
+    ["s", "Старт", "до 0:00, закуп на линию"],
+    ["e", "Ранняя игра", "лайнинг, до ~12 минуты"],
+    ["m", "Мид-гейм", "~12–25 минута, основные предметы"],
+    ["l", "Лейт", "~25–40 минута"],
+    ["h", "Гиперлейт", "40+ минута, самые дорогие слоты"],
+    ["o", "Ситуативные", "по обстановке в игре"],
+  ];
+  const mk = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  };
+  const heroes = HERO_DB;
+  const byKey = Object.fromEntries(heroes.map(h => [h.k, h]));
+  let attr = "all", query = "", cur = null;
+
+  const grid = document.getElementById("grid");
+  function renderList() {
+    const q = query.trim().toLowerCase();
+    const list = heroes.filter(h => (attr === "all" || h.a === attr) && (!q || h.n.toLowerCase().includes(q)));
+    grid.innerHTML = "";
+    list.forEach(h => {
+      const b = mk("button", "tile"); b.type = "button"; b.setAttribute("role", "listitem");
+      b.setAttribute("aria-pressed", String(cur === h.k)); b.dataset.k = h.k; b.title = h.n;
+      const im = mk("img"); im.src = PORTRAIT[h.k] || ""; im.alt = ""; im.width = 128; im.height = 72; im.loading = "lazy";
+      b.append(im, mk("span", "", h.n));
+      b.addEventListener("click", () => select(h.k, true));
+      grid.append(b);
+    });
+    document.getElementById("count").textContent = list.length ? `Героев: ${list.length}` : "Никого не нашлось, попробуйте другое имя";
+  }
+
+  function itemFig(e) {
+    const f = mk("figure", "it");
+    const im = mk("img"); im.src = IT_ICON[e[2]] || ""; im.alt = ""; im.width = 60; im.height = 44;
+    f.append(im, mk("figcaption", "", e[0]));
+    if (e[1] > 1) f.append(mk("span", "cnt", "×" + e[1]));
+    return f;
+  }
+
+  function slug(n) { return n.toLowerCase().replace(/'/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+
+  function renderGuide(h) {
+    const box = document.getElementById("guide");
+    box.innerHTML = "";
+    // шапка
+    const head = mk("div", "g-head");
+    const im = mk("img"); im.src = PORTRAIT[h.k] || ""; im.alt = h.n; im.width = 192; im.height = 108;
+    const t = mk("div", "g-title"); t.append(mk("h2", "", h.n));
+    const chips = mk("div", "chips");
+    chips.append(mk("span", "chip attr-" + h.a, ATTR[h.a]), mk("span", "chip", h.t === "Melee" ? "Ближний бой" : "Дальний бой"));
+    h.r.forEach(r => chips.append(mk("span", "chip", r)));
+    if (h.pos) chips.append(mk("span", "chip", "Основная позиция: " + h.pos));
+    chips.append(mk("span", "chip", `Дальность атаки ${h.rg}`), mk("span", "chip", `Скорость ${h.ms}`));
+    t.append(chips);
+    const live = mk("div", "live");
+    const pt = mk("a", "btn-link", "ProTracker"); pt.href = "https://dota2protracker.com/hero/" + encodeURIComponent(h.n); pt.target = "_blank"; pt.rel = "noopener";
+    const db = mk("a", "btn-link", "Dotabuff"); db.href = "https://www.dotabuff.com/heroes/" + slug(h.n); db.target = "_blank"; db.rel = "noopener";
+    live.append(pt, db, mk("small", "", "Живая статистика матчей по ролям"));
+    t.append(live);
+    head.append(im, t); box.append(head);
+
+    // предметы
+    const is = mk("section", "sec"); is.append(mk("h3", "", "Предметы по стадиям"));
+    if (h.b) {
+      const st = mk("div", "stages");
+      STAGES.forEach(([k, title, time]) => {
+        const list = h.b[k] || [];
+        if (!list.length) return;
+        const row = mk("div", "stage"), tt = mk("div", "st-title"), its = mk("div", "st-items");
+        tt.append(mk("b", "", title), mk("span", "", time));
+        list.forEach(e => its.append(itemFig(e)));
+        row.append(tt, its); st.append(row);
+      });
+      is.append(st);
+    } else {
+      is.append(mk("p", "note", "У этого героя пока нет официальной сборки. Откройте ProTracker или Dotabuff выше."));
+    }
+    box.append(is);
+
+    // прокачка
+    const sk = mk("section", "sec");
+    const h3 = mk("h3", "", "Прокачка способностей");
+    sk.append(h3);
+    if (h.sk) {
+      const scroll = mk("div", "skills-scroll"), g = mk("div", "skills");
+      g.append(mk("div", "lab lv"));
+      for (let l = 1; l <= 25; l++) g.append(mk("div", "lv", l));
+      h.ab.forEach(a => {
+        const lab = mk("div", "lab"), ic = mk("img"); ic.src = AB_ICON[a.k] || ""; ic.alt = ""; ic.width = 22; ic.height = 22;
+        lab.append(ic, mk("span", "", a.n)); lab.title = a.n; g.append(lab);
+        for (let l = 1; l <= 25; l++) g.append(mk("div", (a.s === "r" ? "ult " : "") + (h.sk[l - 1] === a.s ? "on" : "")));
+      });
+      const tl = mk("div", "lab"); tl.append(mk("span", "", "Таланты")); g.append(tl);
+      for (let l = 1; l <= 25; l++) g.append(mk("div", "tl " + (h.sk[l - 1] === "t" ? "on" : "")));
+      scroll.append(g); sk.append(scroll);
+      sk.append(mk("p", "note", "Золотая точка: уровень способности. Красная: ультимейт. Фиолетовый квадрат: талант. Порядок составлен вручную, это ориентир."));
+    } else {
+      const ab = mk("div", "abil");
+      h.ab.forEach(a => {
+        const d = mk("div"), ic = mk("img"); ic.src = AB_ICON[a.k] || ""; ic.alt = ""; ic.width = 30; ic.height = 30;
+        d.append(ic, mk("span", "", a.n));
+        if (a.i) d.append(mk("small", "", "врождённая"));
+        ab.append(d);
+      });
+      sk.append(ab, mk("p", "note", "Порядок прокачки для этого героя я не составлял, смотрите его на ProTracker."));
+    }
+    box.append(sk);
+
+    // таланты
+    const ts = mk("section", "sec"); ts.append(mk("h3", "", "Таланты"));
+    const tal = mk("div", "tal");
+    [4, 3, 2, 1].forEach(n => {
+      const tier = h.tal[n - 1]; if (!tier || tier.o.length < 2) return;
+      const row = mk("div", "tal-row");
+      row.append(mk("div", "tal-opt" + (tier.p === 0 ? " pick" : ""), tier.o[0]), mk("div", "tal-lv", [10, 15, 20, 25][n - 1]), mk("div", "tal-opt" + (tier.p === 1 ? " pick" : ""), tier.o[1]));
+      tal.append(row);
+    });
+    ts.append(tal);
+    ts.append(mk("p", "note", h.sk ? "Выделенный талант подобран по роли героя, ориентир а не догма." : "Рекомендованный выбор для этого героя я не размечал."));
+    box.append(ts);
+  }
+
+  function select(k, push) {
+    const h = byKey[k]; if (!h) return;
+    cur = k; renderGuide(h); renderList();
+    if (push) { try { history.replaceState(null, "", "#" + k); } catch {} store.set("dg-hero", k); }
+    document.title = "Гайд: " + h.n;
+    if (push && window.matchMedia("(max-width: 880px)").matches) document.getElementById("guide").scrollIntoView({ block: "start" });
+  }
+
+  document.getElementById("q").addEventListener("input", e => { query = e.target.value; renderList(); });
+  document.getElementById("attrSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    attr = b.dataset.v;
+    document.querySelectorAll("#attrSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    renderList();
+  });
+  document.getElementById("rand").addEventListener("click", () => select(heroes[Math.floor(Math.random() * heroes.length)].k, true));
+
+  const fromHash = (location.hash || "").slice(1);
+  const start = byKey[fromHash] ? fromHash : (byKey[store.get("dg-hero", "")] ? store.get("dg-hero", "") : "axe");
+  select(byKey[start] ? start : heroes[0].k, false);
+})();
+</script>
+</body>
+</html>
