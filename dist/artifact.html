@@ -86,7 +86,6 @@ button:hover { border-color: var(--gold); }
 .card.radiant { --side: var(--radiant); }
 .card.dire { --side: var(--dire); }
 .card-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.card-head input { flex: 1 1 140px; font-weight: 700; }
 .side-tag { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--side); font-weight: 700; }
 .hero { display: flex; gap: 14px; align-items: center; }
 .hero-main { display: grid; gap: 6px; min-width: 0; flex: 1 1 auto; }
@@ -529,7 +528,6 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
   <article class="card">
     <div class="card-head">
       <span class="side-tag"></span>
-      <input type="text" class="pname" aria-label="Имя игрока">
     </div>
     <div class="hero">
       <img class="portrait" alt="" width="128" height="72">
@@ -1061,8 +1059,8 @@ const SYN_TRIPLES = [[21,22,27,1251,661],[21,22,39,649,313],[21,22,41,1360,683],
 
   const settings = { mode: "smart", attr: "any", chaos: 2, pos: "hero", heroes: "combo", ctype: "any", lane: "any", style: store.get("dr-style", "fun") === "pro" ? "pro" : "fun" };
   const players = [
-    { side: "radiant", tag: "Игрок 1", name: store.get("dr-name-0", "Нурбек"), locked: false, hero: null, roll: null },
-    { side: "radiant", tag: "Игрок 2", name: store.get("dr-name-1", "Друг"), locked: false, hero: null, roll: null },
+    { side: "radiant", tag: "Игрок 1", name: "Игрок 1", locked: false, hero: null, roll: null },
+    { side: "radiant", tag: "Игрок 2", name: "Игрок 2", locked: false, hero: null, roll: null },
   ];
   let duoText = "";
   let current = null; // { combo, swap }: swap=true значит герой b достаётся первому игроку
@@ -1298,10 +1296,6 @@ const SYN_TRIPLES = [[21,22,27,1251,661],[21,22,39,649,313],[21,22,41,1360,683],
     const node = tpl.content.firstElementChild.cloneNode(true);
     node.classList.add(p.side);
     node.querySelector(".side-tag").textContent = p.tag;
-    const inp = node.querySelector(".pname");
-    inp.id = `pname-${idx}`;
-    inp.value = p.name;
-    inp.addEventListener("input", () => { p.name = inp.value.trim() || p.tag; store.set(`dr-name-${idx}`, p.name); });
     node.querySelector('[data-act="roll"]').addEventListener("click", () => spin([idx]));
     node.querySelector('[data-act="build"]').addEventListener("click", () => { rollPlayer(p, true); render(idx); });
     const guideBtn = node.querySelector('[data-act="guide"]');
