@@ -86,7 +86,17 @@ button:hover { border-color: var(--gold); }
 .card-head input { flex: 1 1 140px; font-weight: 700; }
 .side-tag { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--side); font-weight: 700; }
 
-.hero { display: grid; gap: 6px; }
+.hero { display: flex; gap: 14px; align-items: center; }
+.hero-main { display: grid; gap: 6px; min-width: 0; flex: 1 1 auto; }
+.portrait { width: 128px; height: 72px; flex: none; border-radius: 4px; object-fit: cover; background: var(--panel-2); border: 1px solid var(--line); display: block; }
+@media (max-width: 420px) { .portrait { width: 96px; height: 54px; } }
+.combo-art { display: flex; align-items: center; gap: 8px; margin-block: 4px; }
+.combo-art .portrait { width: 112px; height: 63px; }
+.combo-art .plus { color: var(--gold); font-family: var(--display); font-size: 1.6rem; }
+.ico { width: 44px; height: 32px; object-fit: cover; border-radius: 3px; display: block; background: var(--panel); border: 1px solid var(--line); }
+.mini { width: 20px; height: 20px; border-radius: 3px; vertical-align: -5px; margin-right: 4px; }
+.mini-row { display: inline-flex; gap: 4px; }
+.mini-row .mini { margin-right: 0; }
 .hero-name {
   font-family: var(--display); font-weight: 800; font-size: clamp(1.8rem, 4.2vw, 2.6rem); line-height: 1.05;
   text-wrap: balance; min-height: 1.1em;
@@ -109,10 +119,9 @@ button:hover { border-color: var(--gold); }
 
 ol.build { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; counter-reset: slot; }
 ol.build li {
-  counter-increment: slot; display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center;
+  display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center;
   padding: 7px 10px; background: var(--panel-2); border-radius: 4px; border-left: 3px solid var(--tier, var(--line));
 }
-ol.build li::before { content: counter(slot); font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; text-align: right; }
 ol.build li .nm { font-weight: 700; min-width: 0; }
 ol.build li .kind { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 ol.build li.t-boots { --tier: #8a7a63; }
@@ -250,6 +259,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     <div class="combo-head">
       <div>
         <span class="eyebrow" id="comboEyebrow">Связка дуэта</span>
+        <div class="combo-art" id="comboArt" aria-hidden="true"></div>
         <h2 id="comboTitle">…</h2>
         <div class="combo-name" id="comboName"></div>
         <div class="chips" id="comboChips"></div>
@@ -277,6 +287,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
   </section>
 
   <footer>
+    <span>Иконки героев и предметов взяты из открытого репозитория <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, сами изображения принадлежат Valve Corporation.</span>
     <span>Связки с пометкой «из обзоров» взяты из этих материалов, остальные это известная классика. Патчи меняют героев, поэтому перед катками загляни в актуальные изменения.</span>
     <ul>
       <li><a href="https://estnn.com/dota-2-duo-queue-dominance-2024-best-two-heroes-to-get-for-the-safe-lane/" target="_blank" rel="noopener">ESTNN, дуэты для безопасной линии</a></li>
@@ -298,8 +309,11 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
       <input type="text" class="pname" aria-label="Имя игрока">
     </div>
     <div class="hero">
-      <div class="hero-name" aria-live="polite">…</div>
-      <div class="chips"></div>
+      <img class="portrait" alt="" width="128" height="72">
+      <div class="hero-main">
+        <div class="hero-name" aria-live="polite">…</div>
+        <div class="chips"></div>
+      </div>
     </div>
     <div>
       <div class="section-title"><span class="archetype"></span><span class="eyebrow">сборка</span></div>
@@ -320,6 +334,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
   </article>
 </template>
 
+<script src="icons.js"></script>
 <script>
 (() => {
   // ── Герои: [имя, атрибут, позиции] ────────────────────────────────
@@ -340,7 +355,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     ["Crystal Maiden","int",[5]],["Lion","int",[4,5]],["Lina","int",[2]],["Zeus","int",[2,4]],["Shadow Shaman","int",[5]],
     ["Witch Doctor","int",[5]],["Lich","int",[5]],["Jakiro","int",[5]],["Disruptor","int",[5]],["Skywrath Mage","int",[4]],
     ["Ancient Apparition","int",[5]],["Warlock","int",[5]],["Oracle","int",[5]],["Silencer","int",[5]],["Shadow Demon","int",[5]],
-    ["Rubick","int",[4]],["Outworld Destroyer","int",[2]],["Puck","int",[2]],["Queen of Pain","int",[2]],["Storm Spirit","int",[2]],
+    ["Rubick","int",[4]],["Outworld Devourer","int",[2]],["Puck","int",[2]],["Queen of Pain","int",[2]],["Storm Spirit","int",[2]],
     ["Tinker","int",[2]],["Death Prophet","int",[2,3]],["Leshrac","int",[2]],["Necrophos","int",[2,3]],["Pugna","int",[4,2]],
     ["Keeper of the Light","int",[4]],["Grimstroke","int",[4,5]],["Chen","int",[5]],["Enchantress","int",[5]],
     ["Nature's Prophet","int",[3,4]],["Muerta","int",[1]],
@@ -664,6 +679,9 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     const nameEl = c.querySelector(".hero-name");
     nameEl.classList.remove("spinning");
     nameEl.textContent = p.hero[0];
+    const art = c.querySelector(".portrait");
+    art.src = HERO_ART[p.hero[0]] || "";
+    art.alt = p.hero[0];
     const chips = c.querySelector(".chips");
     chips.innerHTML = "";
     const addChip = (txt, cls) => { const s = document.createElement("span"); s.className = "chip " + cls; s.textContent = txt; chips.appendChild(s); };
@@ -677,7 +695,8 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     r.build.items.forEach(it => {
       const li = document.createElement("li");
       li.className = "t-" + it.t;
-      li.innerHTML = `<span class="nm"></span><span class="kind"></span>`;
+      li.innerHTML = `<img class="ico" alt="" width="44" height="32"><span class="nm"></span><span class="kind"></span>`;
+      li.querySelector(".ico").src = ITEM_ICON[it.n] || "";
       li.querySelector(".nm").textContent = it.n;
       li.querySelector(".kind").textContent = it.k;
       ol.appendChild(li);
@@ -699,6 +718,13 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     const c = free ? matchCombo() : current.combo;
     const names = free ? players.map(p => p.hero[0]) : [players[0].hero[0], players[1].hero[0]];
     document.getElementById("comboTitle").textContent = names.join(" + ");
+    const artBox = document.getElementById("comboArt");
+    artBox.innerHTML = "";
+    names.forEach((n, i) => {
+      if (i) { const pl = document.createElement("span"); pl.className = "plus"; pl.textContent = "+"; artBox.appendChild(pl); }
+      const im = document.createElement("img"); im.className = "portrait"; im.src = HERO_ART[n] || ""; im.alt = n; im.width = 112; im.height = 63;
+      artBox.appendChild(im);
+    });
     document.getElementById("comboEyebrow").textContent = free ? "Свободный рандом" : "Связка дуэта";
     document.getElementById("nextCombo").textContent = free ? "Новая пара" : "Другая связка";
     document.getElementById("swapHeroes").hidden = false;
@@ -735,7 +761,9 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
       targets.forEach(i => {
         const el = cards[i].querySelector(".hero-name");
         el.classList.add("spinning");
-        el.textContent = pick(HEROES)[0];
+        const h = pick(HEROES)[0];
+        el.textContent = h;
+        cards[i].querySelector(".portrait").src = HERO_ART[h] || "";
       });
       if (++t >= 14) { clearInterval(timer); finish(); }
     }, 55);
@@ -747,6 +775,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     const now = new Date();
     history.unshift({
       t: now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }),
+      h: players.map(p => p.hero[0]),
       s: (settings.heroes === "combo" && current ? `«${current.combo.title}»  ` : "") + players.map(p => `${p.name}: ${p.hero[0]} (pos ${p.roll.pos}, ${p.roll.build.title})`).join("  ·  "),
     });
     history = history.slice(0, 8);
@@ -759,7 +788,9 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     if (!history.length) { ul.innerHTML = "<li>Пока пусто. Жми «Крутить обоих».</li>"; return; }
     history.forEach(h => {
       const li = document.createElement("li");
-      li.innerHTML = "<time></time><b></b>";
+      li.innerHTML = "<time></time><span class=\"mini-row\"></span><b></b>";
+      const row = li.querySelector(".mini-row");
+      (h.h || []).forEach(n => { if (HERO_ICON[n]) { const im = document.createElement("img"); im.className = "mini"; im.src = HERO_ICON[n]; im.alt = n; im.width = 20; im.height = 20; row.appendChild(im); } });
       li.querySelector("time").textContent = h.t;
       li.querySelector("b").textContent = h.s;
       ul.appendChild(li);
