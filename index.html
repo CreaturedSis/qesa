@@ -157,6 +157,38 @@ ol.build li.t-troll .kind { color: var(--troll); }
 .history li time { font-variant-numeric: tabular-nums; }
 .history li b { color: var(--ink); font-weight: 500; }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--gold); color: #1a140c; padding: 8px 16px; border-radius: 4px; font-weight: 700; }
+
+.pro-mode .fun-only, .fun-mode .pro-only { display: none !important; }
+.guide { display: grid; gap: 16px; }
+.g-sec { display: grid; gap: 8px; min-width: 0; }
+.g-sec h3 { font-family: var(--display); font-size: 1.1rem; margin: 0; color: var(--gold); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.g-sec h3 small { font-family: var(--body); font-size: .78rem; color: var(--muted); font-weight: 400; }
+.g-note { margin: 0; font-size: .85rem; color: var(--muted); }
+.skills-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--panel-2); }
+.skills { display: grid; grid-template-columns: 150px repeat(25, 26px); width: max-content; }
+.skills > * { height: 30px; display: flex; align-items: center; justify-content: center; font-size: .72rem; color: var(--muted); border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.skills .lab { justify-content: flex-start; gap: 6px; padding-inline: 6px; position: sticky; left: 0; z-index: 1; background: var(--panel-2); color: var(--ink); font-size: .8rem; border-right: 1px solid var(--line); overflow: hidden; white-space: nowrap; }
+.skills .lab span { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.skills .lab img { width: 22px; height: 22px; border-radius: 3px; flex: none; }
+.skills .lv { background: var(--panel); }
+.skills .on::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--gold); }
+.skills .ult.on::before { background: var(--dire); }
+.skills .tl.on::before { border-radius: 3px; background: var(--troll); }
+.skills .last { border-bottom: 0; }
+.tal { display: grid; gap: 6px; }
+.tal-row { display: grid; grid-template-columns: 1fr 36px 1fr; gap: 6px; align-items: stretch; }
+.tal-opt { padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; font-size: .8rem; color: var(--muted); line-height: 1.3; min-width: 0; overflow-wrap: anywhere; }
+.tal-opt.pick { border-color: var(--gold); color: var(--ink); background: var(--panel-2); }
+.tal-lv { align-self: center; justify-self: center; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--panel-2); color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+.stages { display: grid; }
+.stage { display: grid; grid-template-columns: 112px 1fr; gap: 10px; padding-block: 10px; border-top: 1px solid var(--line); min-width: 0; }
+@media (max-width: 560px) { .stage { grid-template-columns: 1fr; gap: 6px; } }
+.st-title b { display: block; font-family: var(--display); font-size: 1.02rem; }
+.st-title span { font-size: .78rem; color: var(--muted); }
+.st-items { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.it { display: grid; gap: 3px; justify-items: center; width: 66px; margin: 0; }
+.it img { width: 56px; height: 41px; object-fit: cover; border-radius: 3px; border: 1px solid var(--line); background: var(--panel-2); }
+.it figcaption { font-size: .68rem; line-height: 1.15; text-align: center; color: var(--muted); overflow-wrap: anywhere; }
 footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
 footer a { color: var(--gold); }
 footer ul { margin: 0; padding-left: 18px; columns: 2 260px; }
@@ -183,21 +215,38 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap fun-mode" id="wrap">
   <header class="top">
     <div class="brand">
       <h1>Дота <span>Рулетка</span></h1>
-      <p>Связки героев для одной линии, у каждой есть план на быстрый килл. Если хочется чистого хаоса, переключи на «Свободно»: герои и сборки полностью случайные.</p>
+      <p>Герои и связки для двоих на одной линии. В стиле «Фан» сборки с челленджами для смеха, в стиле «Серьёзно» гайды по героям с прокачкой, талантами и предметами по стадиям.</p>
     </div>
     <button class="btn-main" id="rollAll" type="button">Крутить обоих</button>
   </header>
 
   <div class="controls">
     <div class="field">
+      <span class="eyebrow" id="styleLbl">Стиль</span>
+      <div class="seg" role="group" aria-labelledby="styleLbl" id="styleSeg">
+        <button type="button" data-v="fun" aria-pressed="true">Фан</button>
+        <button type="button" data-v="pro" aria-pressed="false">Серьёзно</button>
+      </div>
+    </div>
+    <div class="field">
       <span class="eyebrow" id="heroLbl">Герои</span>
       <div class="seg" role="group" aria-labelledby="heroLbl" id="heroSeg">
         <button type="button" data-v="combo" aria-pressed="true">Связки</button>
         <button type="button" data-v="free" aria-pressed="false">Свободно</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="eyebrow" id="laneLbl">Линия</span>
+      <div class="seg" role="group" aria-labelledby="laneLbl" id="laneSeg">
+        <button type="button" data-v="any" aria-pressed="true">Любая</button>
+        <button type="button" data-v="safe" aria-pressed="false">Изи 1+5</button>
+        <button type="button" data-v="off" aria-pressed="false">Хард 3+4</button>
+        <button type="button" data-v="mid" aria-pressed="false">Мид 2+4</button>
+        <button type="button" data-v="split" aria-pressed="false">Вне линии</button>
       </div>
     </div>
     <div class="field">
@@ -210,14 +259,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
         <option value="global">Глобальная</option>
       </select>
     </div>
-    <div class="field">
-      <span class="eyebrow" id="laneLbl">Линия</span>
-      <div class="seg" role="group" aria-labelledby="laneLbl" id="laneSeg">
-        <button type="button" data-v="1" aria-pressed="true">Одна на двоих</button>
-        <button type="button" data-v="0" aria-pressed="false">Любая</button>
-      </div>
-    </div>
-    <div class="field">
+    <div class="field fun-only">
       <label for="mode">Режим сборки</label>
       <select id="mode">
         <option value="smart" selected>Под роль героя</option>
@@ -235,7 +277,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
         <option value="uni">Универсал</option>
       </select>
     </div>
-    <div class="field">
+    <div class="field fun-only">
       <span class="eyebrow" id="chaosLbl">Челленджей на игрока</span>
       <div class="seg" role="group" aria-labelledby="chaosLbl" id="chaosSeg">
         <button type="button" data-v="0" aria-pressed="false">0</button>
@@ -244,7 +286,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
         <button type="button" data-v="3" aria-pressed="false">3</button>
       </div>
     </div>
-    <div class="field">
+    <div class="field fun-only">
       <span class="eyebrow" id="posLbl">Позиция (свободно)</span>
       <div class="seg" role="group" aria-labelledby="posLbl" id="posSeg">
         <button type="button" data-v="hero" aria-pressed="true">Родная</button>
@@ -275,7 +317,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
 
   <section class="duel" id="duel"></section>
 
-  <section class="duo" aria-live="polite">
+  <section class="duo fun-only" aria-live="polite">
     <h2>Задание дуэта</h2>
     <p id="duoText">…</p>
     <button type="button" id="rerollDuo">Другое задание</button>
@@ -287,6 +329,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
   </section>
 
   <footer>
+    <span class="pro-only">Гайды в стиле «Серьёзно» составлены вручную по актуальной мете и оформлены по образцу dota2protracker, но это не выгрузка с сайта: он недоступен из среды, где собиралась страница. Таланты подобраны автоматически по роли героя. Перед игрой сверяйтесь с живой статистикой на <a href="https://dota2protracker.com" target="_blank" rel="noopener">dota2protracker.com</a>.</span>
     <span>Иконки героев и предметов взяты из открытого репозитория <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, сами изображения принадлежат Valve Corporation.</span>
     <span>Связки с пометкой «из обзоров» взяты из этих материалов, остальные это известная классика. Патчи меняют героев, поэтому перед катками загляни в актуальные изменения.</span>
     <ul>
@@ -315,26 +358,28 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
         <div class="chips"></div>
       </div>
     </div>
-    <div>
+    <div class="fun-only">
       <div class="section-title"><span class="archetype"></span><span class="eyebrow">сборка</span></div>
       <p class="arch-note"></p>
     </div>
-    <ol class="build"></ol>
-    <div>
+    <ol class="build fun-only"></ol>
+    <div class="fun-only">
       <div class="eyebrow">Челленджи</div>
       <ul class="rules"></ul>
     </div>
-    <div class="meter"><span>Индекс угара</span><span class="bar"><i></i></span><b class="fun-val">0</b></div>
-    <p class="quip"></p>
+    <div class="meter fun-only"><span>Индекс угара</span><span class="bar"><i></i></span><b class="fun-val">0</b></div>
+    <p class="quip fun-only"></p>
+    <div class="guide pro-only"></div>
     <div class="card-actions">
       <button type="button" data-act="roll">Перекрутить всё</button>
-      <button type="button" data-act="build">Только сборку</button>
+      <button type="button" class="fun-only" data-act="build">Только сборку</button>
       <button type="button" data-act="lock" aria-pressed="false">Закрепить героя</button>
     </div>
   </article>
 </template>
 
 <script src="icons.js"></script>
+<script src="guides.js"></script>
 <script>
 (() => {
   // ── Герои: [имя, атрибут, позиции] ────────────────────────────────
@@ -471,7 +516,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     { a:"Dazzle", b:"Huskar", pa:5, pb:1, lane:"Безопасная", type:"kill", web:1, title:"Бессмертный камикадзе",
       plan:"Huskar бьёт Burning Spears с первого уровня и лезет в каждый размен, а Dazzle сидит рядом с Poison Touch и Shallow Grave. Чем меньше у Huskar здоровья, тем больше он бьёт, поэтому смерти он не боится.",
       key:"Shallow Grave на Huskar, когда у него почти нет здоровья, и в добивание", i:["Glimmer Cape","Armlet of Mordiggian"] },
-    { a:"Slark", b:"Lion", pa:1, pb:4, lane:"Безопасная", type:"kill", web:1, title:"Убийцы из тумана",
+    { a:"Slark", b:"Lion", pa:1, pb:5, lane:"Безопасная", type:"kill", web:1, title:"Убийцы из тумана",
       plan:"Lion даёт Hex или Earth Spike, Slark прыгает следом Pounce и добивает. На втором-третьем уровне это убивает почти любого лайнера.",
       key:"Earth Spike, Hex, Pounce, автоатаки", i:["Diffusal Blade","Blink Dagger"] },
     { a:"Witch Doctor", b:"Juggernaut", pa:5, pb:1, lane:"Безопасная", type:"kill", web:1, title:"Бочка и вертушка",
@@ -516,7 +561,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     { a:"Undying", b:"Pugna", pa:5, pb:4, lane:"Сложная", type:"kill", web:1, title:"Могильщики",
       plan:"Decay и Nether Ward быстро забирают линию. Tombstone закрывает выход, а Nether Blast по зомби сносит всё вокруг.",
       key:"Tombstone, Nether Blast по зомби, Decay", i:["Glimmer Cape","Aether Lens"] },
-    { a:"Lina", b:"Lion", pa:1, pb:4, lane:"Безопасная", type:"kill", title:"Двойной магический залп",
+    { a:"Lina", b:"Lion", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Двойной магический залп",
       plan:"Lion даёт Hex, Lina кладёт Light Strike Array, и дальше летят Dragon Slave и Laguna Blade. Урон огромный, но мана у обоих тает быстро, так что играйте на размен.",
       key:"Hex или Earth Spike, Light Strike Array, Laguna Blade", i:["Aghanim's Scepter","Aether Lens"] },
     { a:"Magnus", b:"Enigma", pa:3, pb:4, lane:"Сложная", type:"ult", title:"Чёрная дыра и поляризация",
@@ -537,6 +582,101 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     { a:"Zeus", b:"Bloodseeker", pa:2, pb:1, lane:"Глобально", type:"global", web:1, split:1, title:"Охотник и молния",
       plan:"Bloodseeker находит раненых врагов по всей карте, а Thundergod's Wrath добивает их глобально. Особенно эффективно на ранней стадии.",
       key:"Rupture, Thundergod's Wrath по раненому", i:["Aghanim's Scepter","Orchid Malevolence"] },
+
+    // ── Безопасная линия: керри + 5 позиция ──
+    { a:"Sven", b:"Io", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Привязка и молот",
+      plan:"Io привязывается к Sven, Spirits кружат у ног врагов, а Overcharge добавляет скорость атаки и броню. Sven бьёт Storm Hammer и забирает линию уже на втором уровне.",
+      key:"Tether, Storm Hammer, Warcry, Overcharge в размен", i:["Blink Dagger","Force Staff"] },
+    { a:"Phantom Assassin", b:"Lion", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Хекс и крит",
+      plan:"Lion даёт Hex или Earth Spike, а Phantom Assassin прыгает следом Phantom Strike и добивает критами Coup de Grace. Цель редко успевает ответить.",
+      key:"Earth Spike, Hex, Phantom Strike, Stifling Dagger", i:["Desolator","Force Staff"] },
+    { a:"Medusa", b:"Oracle", pa:1, pb:5, lane:"Безопасная", type:"cheese", title:"Живой щит",
+      plan:"Oracle держит Medusa на ногах: Purifying Flames лечит, False Promise спасает от смерти. Medusa спокойно фармит и становится опасной к мидгейму.",
+      key:"Purifying Flames на Medusa, Fate's Edict на агрессоре, False Promise в драке", i:["Manta Style","Aether Lens"] },
+    { a:"Luna", b:"Crystal Maiden", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Лунный лёд",
+      plan:"Frostbite держит цель, Crystal Nova замедляет, а Lucent Beam и Moon Glaives добивают. Arcane Aura даёт Luna запас маны на весь размен.",
+      key:"Frostbite, Lucent Beam, Crystal Nova, Moon Glaives", i:["Mjollnir","Glimmer Cape"] },
+    { a:"Wraith King", b:"Shadow Shaman", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Оковы и стрела",
+      plan:"Shackles держит одного врага, Wraithfire Blast оглушает и замедляет второго, а Wraith King добивает Mortal Strike. Hex заменяет стан, когда Shackles в кулдауне.",
+      key:"Shackles, Wraithfire Blast, Hex на выходе", i:["Blink Dagger","Aether Lens"] },
+    { a:"Spectre", b:"Io", pa:1, pb:5, lane:"Безопасная", type:"global", title:"Призрак через карту",
+      plan:"На линии Io привязывается и лечит Spectre. С шестого уровня вы играете на глобальный Haunt и Relocate: Io переносит обоих к цели за считанные секунды.",
+      key:"Haunt, Relocate, Spectral Dagger", i:["Radiance","Force Staff"] },
+    { a:"Slark", b:"Shadow Shaman", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Оковы и прыжок",
+      plan:"Shackles держит цель, Slark прыгает Pounce и копит Essence Shift. Ether Shock добавляет урон по обоим врагам на линии.",
+      key:"Shackles, Pounce, Saltwater Shiv, Ether Shock", i:["Diffusal Blade","Aether Lens"] },
+    { a:"Chaos Knight", b:"Warlock", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Хаос и узы",
+      plan:"Chaos Bolt оглушает, Fatal Bonds делит урон на всех связанных, а Upheaval замедляет. Chaos Knight лупит по связанным врагам.",
+      key:"Chaos Bolt, Fatal Bonds, Upheaval", i:["Mjollnir","Glimmer Cape"] },
+    { a:"Gyrocopter", b:"Lion", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Хекс и ракеты",
+      plan:"Lion превращает цель в лягушку, Gyrocopter запускает Homing Missile и Rocket Barrage. Flak Cannon добавляет урон по обоим врагам.",
+      key:"Hex, Homing Missile, Rocket Barrage", i:["Aghanim's Scepter","Aether Lens"] },
+    { a:"Troll Warlord", b:"Dazzle", pa:1, pb:5, lane:"Безопасная", type:"cheese", title:"Берсерк с няней",
+      plan:"Dazzle держит Troll на ногах Shadow Wave и Shallow Grave, поэтому он смело лезет в ближний бой. Whirling Axes добивает убегающих.",
+      key:"Shallow Grave на Troll на 10% здоровья, Whirling Axes, Poison Touch", i:["Battle Fury","Mekansm"] },
+    { a:"Drow Ranger", b:"Crystal Maiden", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Лёд и лук",
+      plan:"Frost Arrows замедляет, Crystal Nova и Frostbite держат цель, а Multishot накрывает обоих врагов. Marksmanship ломает броню.",
+      key:"Frostbite, Gust, Frost Arrows, Multishot", i:["Hurricane Pike","Glimmer Cape"] },
+    { a:"Juggernaut", b:"Lion", pa:1, pb:5, lane:"Безопасная", type:"kill", title:"Хекс и вертушка",
+      plan:"Hex удерживает цель, Juggernaut крутит Blade Fury и разворачивает размен на их половину. Healing Ward лечит после драки.",
+      key:"Earth Spike, Hex, Blade Fury", i:["Battle Fury","Force Staff"] },
+    // ── Сложная линия: 3 + 4 позиция ──
+    { a:"Mars", b:"Snapfire", pa:3, pb:4, lane:"Сложная", type:"kill", title:"Арена и печенье",
+      plan:"Snapfire отправляет Firesnap Cookie и подкидывает цель к Mars, который пригвождает её Spear of Mars. Arena of Blood запирает врагов, пока работают Scatterblast и Mortimer Kisses.",
+      key:"Spear of Mars, Firesnap Cookie, Arena of Blood", i:["Blink Dagger","Force Staff"] },
+    { a:"Bristleback", b:"Venomancer", pa:3, pb:4, lane:"Сложная", type:"cheese", title:"Иглы и яд",
+      plan:"Bristleback принимает урон спиной и сыплет Quill Spray, а Venomancer накладывает Venomous Gale и Poison Sting. Враги теряют здоровье быстрее, чем успевают вернуться.",
+      key:"Venomous Gale, Quill Spray, Snakebite", i:["Crimson Guard","Force Staff"] },
+    { a:"Centaur Warrunner", b:"Earthshaker", pa:3, pb:4, lane:"Сложная", type:"ult", title:"Двойной стан",
+      plan:"Hoof Stomp и Fissure перекрывают отход, Echo Slam бьёт по всем стоящим. Для начала драки вам хватает двух кнопок.",
+      key:"Fissure, Hoof Stomp, Echo Slam", i:["Blink Dagger","Aghanim's Scepter"] },
+    { a:"Night Stalker", b:"Bounty Hunter", pa:3, pb:4, lane:"Сложная", type:"cheese", title:"Ночные охотники",
+      plan:"Ночью Night Stalker страшен: Void замедляет, Crippling Fear глушит. Bounty Hunter отмечает цель Track и приводит добычу прямо на Night Stalker.",
+      key:"Track, Void, Crippling Fear, Darkness в драку", i:["Blink Dagger","Orchid Malevolence"] },
+    { a:"Batrider", b:"Magnus", pa:3, pb:4, lane:"Сложная", type:"ult", title:"Лассо и поляризация",
+      plan:"Flaming Lasso тащит цель за собой, а Magnus накрывает её Reverse Polarity вместе с командой. Skewer ставит точку.",
+      key:"Flaming Lasso, Reverse Polarity, Skewer", i:["Aghanim's Scepter","Blink Dagger"] },
+    { a:"Sand King", b:"Lion", pa:3, pb:4, lane:"Сложная", type:"kill", title:"Песок и палец",
+      plan:"Burrowstrike поднимает цель, Hex и Earth Spike довершают. Epicenter на шестом уровне сносит обоих врагов на линии.",
+      key:"Burrowstrike, Earth Spike, Hex, Epicenter", i:["Blink Dagger","Aether Lens"] },
+    { a:"Slardar", b:"Nyx Assassin", pa:3, pb:4, lane:"Сложная", type:"kill", title:"Ржавчина и панцирь",
+      plan:"Nyx оглушает Impale, Slardar добавляет Slithereen Crush и Corrosive Haze. Враг с минусом брони падает почти мгновенно.",
+      key:"Impale, Slithereen Crush, Corrosive Haze", i:["Blink Dagger","Orchid Malevolence"] },
+    { a:"Legion Commander", b:"Pudge", pa:3, pb:4, lane:"Сложная", type:"kill", title:"Крюк и дуэль",
+      plan:"Pudge вытягивает Meat Hook, Legion Commander мгновенно делает Duel и уходит с бонусом к урону. Rot не даёт убежать.",
+      key:"Meat Hook, Overwhelming Odds, Duel", i:["Blink Dagger","Heaven's Halberd"] },
+    { a:"Dawnbreaker", b:"Mirana", pa:3, pb:4, lane:"Сложная", type:"kill", title:"Солнце издалека",
+      plan:"Mirana стреляет Sacred Arrow издалека, Dawnbreaker прилетает по Solar Guardian на помощь и лечит. Starbreaker добивает.",
+      key:"Sacred Arrow, Celestial Hammer, Solar Guardian", i:["Blink Dagger","Force Staff"] },
+    { a:"Primal Beast", b:"Earthshaker", pa:3, pb:4, lane:"Сложная", type:"kill", title:"Трещина и рёв",
+      plan:"Fissure перекрывает путь, Primal Beast сбивает с ног Onslaught и Pulverize. Две оглушающие кнопки подряд почти гарантируют килл.",
+      key:"Fissure, Onslaught, Pulverize", i:["Blink Dagger","Aghanim's Scepter"] },
+    { a:"Axe", b:"Lion", pa:3, pb:4, lane:"Сложная", type:"kill", title:"Призыв и палец",
+      plan:"Berserker's Call заставляет врагов бить Axe, Hex и Earth Spike довершают. Culling Blade добивает слабого, Finger of Death ищет остальных.",
+      key:"Berserker's Call, Earth Spike, Hex, Culling Blade", i:["Blink Dagger","Aether Lens"] },
+    // ── Мид и роумер: 2 + 4 позиция ──
+    { a:"Storm Spirit", b:"Mirana", pa:2, pb:4, lane:"Мид", type:"kill", title:"Шторм и стрела",
+      plan:"Sacred Arrow оглушает издалека, Storm Spirit влетает Ball Lightning и добивает Static Remnant. Leap Mirana ускоряет обоих.",
+      key:"Sacred Arrow, Ball Lightning, Static Remnant", i:["Orchid Malevolence","Force Staff"] },
+    { a:"Queen of Pain", b:"Spirit Breaker", pa:2, pb:4, lane:"Мид", type:"kill", title:"Звуковая атака",
+      plan:"Spirit Breaker врезается Charge of Darkness, Queen of Pain добивает Scream of Pain и Sonic Wave. Блинк делает размен безопасным.",
+      key:"Charge of Darkness, Shadow Strike, Scream of Pain, Sonic Wave", i:["Kaya and Sange","Blink Dagger"] },
+    { a:"Zeus", b:"Earthshaker", pa:2, pb:4, lane:"Мид", type:"kill", title:"Молния и трещина",
+      plan:"Fissure не даёт уйти, Zeus пробивает Lightning Bolt и Arc Lightning. Thundergod's Wrath добивает почти любого.",
+      key:"Fissure, Lightning Bolt, Arc Lightning, Thundergod's Wrath", i:["Aghanim's Scepter","Blink Dagger"] },
+    { a:"Lina", b:"Nyx Assassin", pa:2, pb:4, lane:"Мид", type:"kill", title:"Стан и Laguna",
+      plan:"Impale оглушает, Light Strike Array закрепляет, Dragon Slave и Laguna Blade завершают. Mind Flare сжигает ману у врага-мага.",
+      key:"Impale, Light Strike Array, Dragon Slave, Laguna Blade", i:["Kaya and Sange","Orchid Malevolence"] },
+    { a:"Puck", b:"Skywrath Mage", pa:2, pb:4, lane:"Мид", type:"ult", title:"Рифт и звёзды",
+      plan:"Waning Rift глушит врагов в зоне, Skywrath Mage ставит Ancient Seal и Mystic Flare. Dream Coil привязывает цель, а Phase Shift спасает от ответа.",
+      key:"Waning Rift, Ancient Seal, Mystic Flare, Dream Coil", i:["Aghanim's Scepter","Aether Lens"] },
+    // ── Вне линии: ульты мидгейма ──
+    { a:"Dark Seer", b:"Faceless Void", pa:3, pb:1, lane:"Мид-гейм", type:"ult", split:1, title:"Стена во времени",
+      plan:"Chronosphere держит врагов на месте, а Dark Seer ставит Wall of Replica с иллюзиями. Иллюзии бьют лучше самого героя, пока враги не могут двигаться.",
+      key:"Chronosphere, Wall of Replica, Vacuum", i:["Blink Dagger","Black King Bar"] },
+    { a:"Magnus", b:"Puck", pa:3, pb:2, lane:"Мид-гейм", type:"ult", split:1, title:"Фазовый разворот",
+      plan:"Puck входит в драку Phase Shift и ставит Dream Coil, Magnus собирает всех Reverse Polarity. Waning Rift молчит оставшихся.",
+      key:"Waning Rift, Reverse Polarity, Dream Coil", i:["Blink Dagger","Aghanim's Scepter"] },
     { a:"Io", b:"Zeus", pa:5, pb:2, lane:"Глобально", type:"global", web:1, split:1, title:"Телепорт с неожиданным ударом",
       plan:"Io телепортирует себя и союзника куда угодно, а Zeus показывает всех на карте и бьёт по ним ультом. Убежать почти невозможно.",
       key:"Relocate на цель, Thundergod's Wrath", i:["Force Staff","Aghanim's Scepter"] },
@@ -558,7 +698,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
   };
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const settings = { mode: "smart", attr: "any", chaos: 2, pos: "hero", heroes: "combo", ctype: "any", oneLane: true };
+  const settings = { mode: "smart", attr: "any", chaos: 2, pos: "hero", heroes: "combo", ctype: "any", lane: "any", style: store.get("dr-style", "fun") === "pro" ? "pro" : "fun" };
   const players = [
     { side: "radiant", tag: "Radiant", name: store.get("dr-name-0", "Нурбек"), locked: false, hero: null, roll: null },
     { side: "dire", tag: "Dire", name: store.get("dr-name-1", "Друг"), locked: false, hero: null, roll: null },
@@ -619,21 +759,59 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     return Math.min(100, s + rnd(8));
   }
 
+  const LANES = {
+    safe: { label: "Безопасная", title: "Изи лайн", pos: [1, 5] },
+    off: { label: "Сложная", title: "Хард лайн", pos: [3, 4] },
+    mid: { label: "Мид", title: "Мид с роумером", pos: [2, 4] },
+  };
+  const isPro = () => settings.style === "pro";
+  const hasGuide = n => typeof GUIDES !== "undefined" && !!GUIDES[n];
+  let proLane = null;
+
+  function comboAllowed(c) {
+    if (isPro() && !(hasGuide(c.a) && hasGuide(c.b))) return false;
+    if (settings.lane === "any") return !c.split;
+    if (settings.lane === "split") return !!c.split;
+    return c.lane === LANES[settings.lane].label;
+  }
   function pickCombo() {
-    const byType = COMBOS.filter(c => settings.ctype === "any" || c.type === settings.ctype);
-    let pool = byType.filter(c => !settings.oneLane || !c.split);
-    if (!pool.length) pool = byType.length ? byType : COMBOS;
+    let byType = COMBOS.filter(c => (settings.ctype === "any" || c.type === settings.ctype) && comboAllowed(c));
+    if (!byType.length) byType = COMBOS.filter(c => comboAllowed(c));
+    if (!byType.length) byType = COMBOS.filter(c => !isPro() || (hasGuide(c.a) && hasGuide(c.b)));
+    const pool = byType;
     const fresh = pool.filter(c => !current || c !== current.combo);
     current = { combo: pick(fresh.length ? fresh : pool), swap: rnd(2) === 1 };
   }
 
   function comboSide(idx) { return current.swap ? (idx === 0 ? "b" : "a") : (idx === 0 ? "a" : "b"); }
 
+  // Серьёзный режим без связок: два героя с гайдами под позиции выбранной линии
+  let forced = null;
+  function pickProPair() {
+    const lane = settings.lane in LANES ? settings.lane : pick(Object.keys(LANES));
+    proLane = lane;
+    const [pa, pb] = LANES[lane].pos;
+    const names = Object.keys(GUIDES);
+    const okAttr = n => settings.attr === "any" || findHero(n)[1] === settings.attr;
+    const poolFor = (ps, ex) => {
+      const all = names.filter(n => GUIDES[n].pos === ps && n !== ex);
+      const f = all.filter(okAttr);
+      return f.length ? f : all;
+    };
+    const a = pick(poolFor(pa, null));
+    const b = pick(poolFor(pb, a));
+    const pair = [{ hero: findHero(a), pos: pa }, { hero: findHero(b), pos: pb }];
+    return rnd(2) ? pair.reverse() : pair;
+  }
+
   function rollPlayer(p, onlyBuild) {
     const idx = players.indexOf(p);
     const useCombo = settings.heroes === "combo" && current;
     let pos, hint = null;
-    if (useCombo) {
+    if (forced && !onlyBuild) {
+      p.hero = forced[idx].hero;
+      pos = forced[idx].pos;
+    } else if (useCombo) {
       const side = comboSide(idx);
       p.hero = findHero(current.combo[side]);
       pos = current.combo["p" + side];
@@ -644,11 +822,74 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
       if (!p.hero) p.hero = rollHero();
       pos = onlyBuild && p.roll ? p.roll.pos : rollPos(p.hero);
     }
-    const r = { pos, offRole: !useCombo && !p.hero[2].includes(pos), build: rollBuild(pos, hint), rules: rollChallenges() };
+    const r = { pos, offRole: !useCombo && !forced && !p.hero[2].includes(pos), build: rollBuild(pos, hint), rules: rollChallenges() };
     r.rules.unshift(`<b>${r.build.twist[0]}</b>: ${r.build.twist[1]}`);
     r.fun = funScore(r);
     r.quip = pick(QUIPS);
     p.roll = r;
+  }
+
+  // ── Гайд героя ───────────────────────────────────────────────────
+  const STAGES = [
+    ["st", "Старт", "до 0:00, закуп на линию"],
+    ["e", "Ранняя игра", "лайнинг, до ~12 минуты"],
+    ["m", "Мид-гейм", "~12–25 минута, основные предметы"],
+    ["l", "Лейт", "~25–40 минута"],
+    ["h", "Гиперлейт", "40+ минута, слоты заполнены"],
+  ];
+  const mk = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  function itemFig(n) {
+    const f = mk("figure", "it");
+    const im = mk("img"); im.src = ITEM_ICON[n] || ""; im.alt = ""; im.width = 56; im.height = 41;
+    f.append(im, mk("figcaption", "", n));
+    return f;
+  }
+  function renderGuide(idx) {
+    const p = players[idx], box = cards[idx].querySelector(".guide");
+    box.innerHTML = "";
+    const g = hasGuide(p.hero[0]) ? GUIDES[p.hero[0]] : null;
+    if (!g) { box.append(mk("p", "g-note", "Для этого героя гайда пока нет.")); return; }
+    const assigned = p.roll.pos;
+    // прокачка
+    const sk = mk("section", "g-sec");
+    const h3 = mk("h3", "", "Прокачка"); h3.append(mk("small", "", `Pos ${g.pos}` + (assigned !== g.pos ? `, по связке Pos ${assigned}` : "")));
+    sk.append(h3);
+    const scroll = mk("div", "skills-scroll"), grid = mk("div", "skills");
+    grid.append(mk("div", "lab lv"));
+    for (let l = 1; l <= 25; l++) grid.append(mk("div", "lv", l));
+    "qwer".split("").forEach(L => {
+      const a = g.ab[L], lab = mk("div", "lab");
+      const im = mk("img"); im.src = ABILITY_ICON[a.k] || ""; im.alt = ""; im.width = 22; im.height = 22;
+      lab.append(im, mk("span", "", a.n)); lab.title = a.n;
+      grid.append(lab);
+      for (let l = 1; l <= 25; l++) grid.append(mk("div", (L === "r" ? "ult " : "") + (g.sk[l - 1] === L ? "on" : "")));
+    });
+    const tl = mk("div", "lab"); tl.append(mk("span", "", "Таланты"));
+    grid.append(tl);
+    for (let l = 1; l <= 25; l++) grid.append(mk("div", "tl " + (g.sk[l - 1] === "t" ? "on" : "")));
+    scroll.append(grid); sk.append(scroll);
+    sk.append(mk("p", "g-note", "Золотая точка: уровень способности. Красная: ультимейт. Фиолетовый квадрат: талант."));
+    box.append(sk);
+    // таланты
+    const ts = mk("section", "g-sec"); ts.append(mk("h3", "", "Таланты"));
+    const tal = mk("div", "tal");
+    [4, 3, 2, 1].forEach(t => {
+      const tier = g.tal[t - 1], row = mk("div", "tal-row");
+      row.append(mk("div", "tal-opt" + (tier.p === 0 ? " pick" : ""), tier.o[0]), mk("div", "tal-lv", [10, 15, 20, 25][t - 1]), mk("div", "tal-opt" + (tier.p === 1 ? " pick" : ""), tier.o[1]));
+      tal.append(row);
+    });
+    ts.append(tal); ts.append(mk("p", "g-note", "Выделенный талант подобран автоматически по роли героя, ориентир а не догма."));
+    box.append(ts);
+    // предметы
+    const is = mk("section", "g-sec"); is.append(mk("h3", "", "Предметы по стадиям"));
+    const st = mk("div", "stages");
+    STAGES.forEach(([k, title, time]) => {
+      const row = mk("div", "stage"), tt = mk("div", "st-title"), its = mk("div", "st-items");
+      tt.append(mk("b", "", title), mk("span", "", time));
+      g[k].forEach(n => its.append(itemFig(n)));
+      row.append(tt, its); st.append(row);
+    });
+    is.append(st); box.append(is);
   }
 
   // ── Рендер ────────────────────────────────────────────────────────
@@ -706,6 +947,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     c.querySelector(".bar i").style.width = r.fun + "%";
     c.querySelector(".fun-val").textContent = r.fun;
     c.querySelector(".quip").textContent = r.quip;
+    renderGuide(idx);
   }
 
   const TYPE_LABEL = { kill: "быстрый килл", cheese: "читерная", ult: "комбо ультов", global: "глобальная" };
@@ -725,7 +967,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
       const im = document.createElement("img"); im.className = "portrait"; im.src = HERO_ART[n] || ""; im.alt = n; im.width = 112; im.height = 63;
       artBox.appendChild(im);
     });
-    document.getElementById("comboEyebrow").textContent = free ? "Свободный рандом" : "Связка дуэта";
+    document.getElementById("comboEyebrow").textContent = free ? (isPro() ? "Случайные герои с гайдами" : "Свободный рандом") : "Связка дуэта";
     document.getElementById("nextCombo").textContent = free ? "Новая пара" : "Другая связка";
     document.getElementById("swapHeroes").hidden = false;
     const chips = document.getElementById("comboChips");
@@ -740,8 +982,9 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
       document.getElementById("comboKeyLbl").textContent = "Ключ:";
       document.getElementById("comboKey").textContent = c.key;
     } else {
-      document.getElementById("comboName").textContent = "Связки нет, импровизируйте";
-      document.getElementById("comboPlan").textContent = "Готового комбо у этой пары нет. Зато нет и шаблона: смотрите на героев и придумывайте свои комбинации.";
+      if (isPro() && proLane) { addChip(LANES[proLane].title + " " + LANES[proLane].pos.join("+"), "type-global"); }
+      document.getElementById("comboName").textContent = isPro() ? "Герои под позиции линии" : "Связки нет, импровизируйте";
+      document.getElementById("comboPlan").textContent = isPro() ? "Герои подобраны под позиции выбранной линии. Ниже у каждого гайд: прокачка, таланты и сборка по стадиям." : "Готового комбо у этой пары нет. Зато нет и шаблона: смотрите на героев и придумывайте свои комбинации.";
       document.getElementById("comboKeyLbl").textContent = "Совет:";
       document.getElementById("comboKey").textContent = pick(FREE_TIPS);
     }
@@ -750,11 +993,13 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
   function renderDuo() { document.getElementById("duoText").textContent = duoText; }
 
   function spin(idxs) {
+    forced = null;
     if (settings.heroes === "combo") { idxs = [0, 1]; pickCombo(); }
+    else if (isPro()) { idxs = [0, 1]; forced = pickProPair(); }
     idxs.forEach(i => rollPlayer(players[i]));
     const finish = () => { idxs.forEach(render); renderCombo(); pushHistory(); };
     if (reduceMotion) return finish();
-    const targets = idxs.filter(i => settings.heroes === "combo" || !players[i].locked);
+    const targets = idxs.filter(i => settings.heroes === "combo" || isPro() || !players[i].locked);
     if (!targets.length) return finish();
     let t = 0;
     const timer = setInterval(() => {
@@ -804,11 +1049,19 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     const cm = settings.heroes === "combo" ? current && current.combo : matchCombo();
     if (cm) lines.push("", `**Связка: ${players.map(p => p.hero[0]).join(" + ")}, «${cm.title}»**`, cm.plan, `Ключ: ${cm.key}`);
     players.forEach(p => {
-      const r = p.roll;
-      lines.push("", `**${p.name}** → ${p.hero[0]} · ${POS[r.pos]}`, `Сборка «${r.build.title}»: ${r.build.items.map(i => i.n).join(" → ")}`);
-      r.rules.forEach(x => lines.push(`• ${strip(x)}`));
+      const r = p.roll, g = isPro() && hasGuide(p.hero[0]) ? GUIDES[p.hero[0]] : null;
+      lines.push("", `**${p.name}** → ${p.hero[0]} · ${POS[r.pos]}`);
+      if (g) {
+        const order = [];
+        g.sk.split("").forEach((c, i) => { if ("qwer".includes(c) && i < 18) order.push(c.toUpperCase()); });
+        lines.push(`Прокачка (1-18): ${g.sk.slice(0, 18).split("").map(c => c === "t" ? "T" : c === "a" ? "+" : c.toUpperCase()).join(" ")}`, `Q ${g.ab.q.n} · W ${g.ab.w.n} · E ${g.ab.e.n} · R ${g.ab.r.n}`);
+        STAGES.forEach(([k, title]) => lines.push(`${title}: ${g[k].join(" → ")}`));
+      } else {
+        lines.push(`Сборка «${r.build.title}»: ${r.build.items.map(i => i.n).join(" → ")}`);
+        r.rules.forEach(x => lines.push(`• ${strip(x)}`));
+      }
     });
-    lines.push("", `Задание дуэта: ${duoText}`);
+    if (!isPro()) lines.push("", `Задание дуэта: ${duoText}`);
     return lines.join("\n");
   }
   function toast(msg) {
@@ -834,7 +1087,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
 
   // ── Настройки ─────────────────────────────────────────────────────
   document.getElementById("mode").addEventListener("change", e => { settings.mode = e.target.value; });
-  document.getElementById("attr").addEventListener("change", e => { settings.attr = e.target.value; });
+  document.getElementById("attr").addEventListener("change", e => { settings.attr = e.target.value; if (settings.heroes === "free" && isPro()) spin([0, 1]); });
   function seg(id, key, cast, onChange) {
     const box = document.getElementById(id);
     box.addEventListener("click", e => {
@@ -845,7 +1098,13 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     });
   }
   document.getElementById("ctype").addEventListener("change", e => { settings.ctype = e.target.value; if (settings.heroes === "combo") spin([0, 1]); });
-  seg("laneSeg", "oneLane", v => v === "1", () => { if (settings.heroes === "combo") spin([0, 1]); });
+  seg("laneSeg", "lane", String, () => spin([0, 1]));
+  function applyStyle() {
+    document.getElementById("wrap").classList.toggle("pro-mode", isPro());
+    document.getElementById("wrap").classList.toggle("fun-mode", !isPro());
+    document.querySelectorAll("#styleSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === settings.style)));
+  }
+  seg("styleSeg", "style", String, () => { store.set("dr-style", settings.style); applyStyle(); spin([0, 1]); });
   seg("heroSeg", "heroes", String, () => {
     duel.classList.toggle("combo-mode", settings.heroes === "combo");
     spin([0, 1]);
@@ -870,6 +1129,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
 
   // Стартовое состояние: сразу показываем готовый бросок
   duel.classList.add("combo-mode");
+  applyStyle();
   pickCombo();
   players.forEach(p => rollPlayer(p));
   players.forEach((_, i) => render(i));
