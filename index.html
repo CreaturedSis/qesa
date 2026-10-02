@@ -338,7 +338,7 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
   </section>
 
   <footer>
-    <span class="pro-only">Сборки по стадиям взяты из официальных сборок Valve в клиенте игры (обновлены с патчем 7.40). Это общая рекомендация, а не статистика матчей: актуальные сборки под вашу роль смотрите на <a href="https://dota2protracker.com" target="_blank" rel="noopener">dota2protracker.com</a>. Порядок прокачки составлен вручную, выбор талантов подобран по роли героя.</span>
+    <span class="pro-only">Сборки по стадиям взяты из официальных сборок Valve в клиенте игры (составлены к патчу 7.40), из них убраны предметы, удалённые в патче 7.41. Это общая рекомендация, а не статистика матчей: актуальные сборки под вашу роль смотрите на <a href="https://dota2protracker.com" target="_blank" rel="noopener">dota2protracker.com</a>. Порядок прокачки составлен вручную, выбор талантов подобран по роли героя.</span>
     <span>Иконки героев и предметов взяты из открытого репозитория <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, сами изображения принадлежат Valve Corporation.</span>
     <span>Связки с пометкой «из обзоров» взяты из этих материалов, остальные это известная классика. Патчи меняют героев, поэтому перед катками загляни в актуальные изменения.</span>
     <ul>
@@ -432,8 +432,8 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
   const ALL_BOOTS = [...new Set([...BOOTS.core, ...BOOTS.sup])];
   const POOLS = {
     1: ["Battle Fury","Manta Style","Black King Bar","Butterfly","Daedalus","Satanic","Abyssal Blade","Eye of Skadi","Monkey King Bar","Desolator","Mjollnir","Disperser","Bloodthorn","Radiance","Silver Edge","Hurricane Pike","Swift Blink","Sange and Yasha","Harpoon","Linken's Sphere","Nullifier","Assault Cuirass","Moon Shard","Aghanim's Scepter"],
-    2: ["Aghanim's Scepter","Octarine Core","Kaya and Sange","Yasha and Kaya","Bloodstone","Scythe of Vyse","Shiva's Guard","Refresher Orb","Ethereal Blade","Dagon","Arcane Blink","Wind Waker","Parasma","Khanda","Witch Blade","Revenant's Brooch","Black King Bar","Linken's Sphere","Orchid Malevolence","Eternal Shroud","Aeon Disk","Desolator","Daedalus"],
-    3: ["Blink Dagger","Overwhelming Blink","Black King Bar","Pipe of Insight","Crimson Guard","Blade Mail","Heaven's Halberd","Assault Cuirass","Shiva's Guard","Lotus Orb","Vladmir's Offering","Heart of Tarrasque","Aghanim's Scepter","Radiance","Kaya and Sange","Eternal Shroud","Nullifier","Refresher Orb","Helm of the Overlord","Aeon Disk"],
+    2: ["Aghanim's Scepter","Octarine Core","Kaya and Sange","Yasha and Kaya","Bloodstone","Scythe of Vyse","Shiva's Guard","Refresher Orb","Ethereal Blade","Dagon","Arcane Blink","Wind Waker","Parasma","Khanda","Witch Blade","Revenant's Brooch","Black King Bar","Linken's Sphere","Orchid Malevolence","Aeon Disk","Desolator","Daedalus"],
+    3: ["Blink Dagger","Overwhelming Blink","Black King Bar","Pipe of Insight","Crimson Guard","Blade Mail","Heaven's Halberd","Assault Cuirass","Shiva's Guard","Lotus Orb","Vladmir's Offering","Heart of Tarrasque","Aghanim's Scepter","Radiance","Kaya and Sange","Nullifier","Refresher Orb","Helm of the Overlord","Aeon Disk"],
     4: ["Glimmer Cape","Force Staff","Aether Lens","Solar Crest","Spirit Vessel","Rod of Atos","Gleipnir","Lotus Orb","Aghanim's Scepter","Blink Dagger","Wind Waker","Holy Locket","Pavise","Veil of Discord","Aeon Disk","Octarine Core","Scythe of Vyse","Orchid Malevolence"],
     5: ["Glimmer Cape","Force Staff","Aether Lens","Solar Crest","Rod of Atos","Lotus Orb","Aghanim's Scepter","Ghost Scepter","Wind Waker","Holy Locket","Pavise","Mekansm","Pipe of Insight","Aeon Disk","Scythe of Vyse","Guardian Greaves","Eul's Scepter of Divinity","Veil of Discord"],
   };
@@ -461,13 +461,13 @@ ol.build li.t-combo .kind { color: #6fa8e0; }
     { name: "Стеклянная пушка", note: "Только урон. Никакой брони, никакого HP, никакого BKB.", boots: ["Phase Boots","Power Treads"],
       items: ["Daedalus","Divine Rapier","Desolator","Monkey King Bar","Bloodthorn","Butterfly","Silver Edge","Moon Shard","Dagon","Ethereal Blade"] },
     { name: "Живая крепость", note: "Урона почти нет. Задача: не умереть ни разу и стоять в центре драки.", boots: ["Boots of Bearing","Guardian Greaves","Phase Boots"],
-      items: ["Heart of Tarrasque","Assault Cuirass","Shiva's Guard","Crimson Guard","Pipe of Insight","Lotus Orb","Blade Mail","Eternal Shroud","Heaven's Halberd","Aeon Disk"] },
+      items: ["Heart of Tarrasque","Assault Cuirass","Shiva's Guard","Crimson Guard","Pipe of Insight","Lotus Orb","Blade Mail","Heaven's Halberd","Aeon Disk"] },
     { name: "Маг на всё", note: "Каждый предмет даёт ману, урон заклинаниями или кнопку.", boots: ["Arcane Boots","Boots of Travel"],
       items: ["Octarine Core","Aether Lens","Ethereal Blade","Dagon","Scythe of Vyse","Parasma","Shiva's Guard","Wind Waker","Refresher Orb","Kaya and Sange","Khanda"] },
     { name: "Скорость света", note: "Цель: 550 скорости передвижения к 25-й минуте.", boots: ["Boots of Travel","Phase Boots"],
       items: ["Sange and Yasha","Yasha and Kaya","Butterfly","Shadow Blade","Wind Waker","Swift Blink","Hurricane Pike","Mask of Madness","Manta Style","Diffusal Blade"] },
     { name: "Вампир", note: "Весь отхил только через вампиризм. Фонтан для слабаков.", boots: ["Phase Boots","Power Treads"],
-      items: ["Satanic","Mask of Madness","Vladmir's Offering","Bloodstone","Kaya and Sange","Armlet of Mordiggian","Eternal Shroud","Spirit Vessel","Heart of Tarrasque"] },
+      items: ["Satanic","Mask of Madness","Vladmir's Offering","Bloodstone","Kaya and Sange","Armlet of Mordiggian","Spirit Vessel","Heart of Tarrasque"] },
     { name: "Ниндзя", note: "Тебя никто не видит, пока ты не нажмёшь кнопку.", boots: ["Phase Boots","Power Treads","Tranquil Boots"],
       items: ["Shadow Blade","Silver Edge","Glimmer Cape","Blink Dagger","Swift Blink","Diffusal Blade","Orchid Malevolence","Bloodthorn","Nullifier"] },
     { name: "Ходячий фонтан", note: "Только ауры и командные предметы. Ты нужен всем.", boots: ["Guardian Greaves","Boots of Bearing"],

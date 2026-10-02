@@ -107,6 +107,15 @@ button:hover { border-color: var(--gold); }
 .tal-opt { padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; font-size: .82rem; color: var(--muted); line-height: 1.3; overflow-wrap: anywhere; }
 .tal-opt.pick { border-color: var(--gold); color: var(--ink); background: var(--panel-2); }
 .tal-lv { align-self: center; justify-self: center; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--panel-2); color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+details.changes { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; }
+details.changes summary { cursor: pointer; font-family: var(--display); font-weight: 700; color: var(--gold); }
+.ch-body { display: grid; gap: 10px; margin-top: 10px; }
+.ch-body p { margin: 0; max-width: 85ch; }
+.newitems { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.ni { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 10px; padding: 8px; background: var(--panel-2); border-radius: 4px; font-size: .85rem; }
+.ni img { width: 56px; height: 41px; border-radius: 3px; border: 1px solid var(--line); object-fit: cover; }
+.ni b { display: block; color: var(--ink); }
+.ni span { color: var(--muted); line-height: 1.3; }
 footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
@@ -140,8 +149,18 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
     <main class="guide" id="guide" aria-live="polite"></main>
   </div>
 
+  <details class="changes" id="changes">
+    <summary>Что изменилось в предметах: патчи 7.41–7.41f</summary>
+    <div class="ch-body">
+      <p><b>Удалены:</b> Cornucopia и Eternal Shroud. Из сборок ниже они уже убраны. Ring of Health и Void Stone вернулись в секретный магазин.</p>
+      <p><b>Переработаны:</b> Shiva's Guard (теперь собирается из Splintmail и Chasm Stone) и Bloodstone. Refresher Orb и Refresher Shard больше не сбрасывают перезарядку предметов. В 7.41f изменились рецепты Dragon Lance, Heart of Tarrasque, Daedalus, Heaven's Halberd и Octarine Core.</p>
+      <p><b>Новые предметы 7.41:</b> в официальные сборки Valve они ещё не попали, поэтому их нет в списках героев. Описания собраны из обзоров патча, цифры могли поменяться в 7.41c–f.</p>
+      <div class="newitems" id="newItems"></div>
+    </div>
+  </details>
+
   <footer>
-    <span>Сборки по стадиям это официальные рекомендации Valve из клиента игры (<a href="https://github.com/SteamDatabase/GameTracking-Dota2" target="_blank" rel="noopener">SteamDatabase/GameTracking-Dota2</a>), последний раз обновлённые с патчем 7.40. Раздел «Гиперлейт» собран из самых дорогих предметов в их списке «по ситуации». Это общая сборка на героя, а не статистика под вашу позицию, поэтому для актуальной меты откройте ссылки на ProTracker и Dotabuff у героя.</span>
+    <span>Сборки по стадиям это официальные рекомендации Valve из клиента игры (<a href="https://github.com/SteamDatabase/GameTracking-Dota2" target="_blank" rel="noopener">SteamDatabase/GameTracking-Dota2</a>), последний раз обновлённые к патчу 7.40. Предметы, удалённые в 7.41, я убрал, новых предметов в них нет. Актуальный патч на момент сборки страницы: 7.41f. Раздел «Гиперлейт» собран из самых дорогих предметов в их списке «по ситуации». Это общая сборка на героя, а не статистика под вашу позицию, поэтому для актуальной меты откройте ссылки на ProTracker и Dotabuff у героя.</span>
     <span>Способности и таланты: <a href="https://github.com/odota/dotaconstants" target="_blank" rel="noopener">odota/dotaconstants</a>. Иконки: <a href="https://github.com/lexogrine/dota2-assets" target="_blank" rel="noopener">lexogrine/dota2-assets</a>, изображения принадлежат Valve Corporation. Порядок прокачки составлен вручную для 91 героя, выбор талантов подобран по роли и носит рекомендательный характер.</span>
   </footer>
 </div>
@@ -162,6 +181,13 @@ footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; }
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   };
+  const ni = document.getElementById("newItems");
+  NEW_ITEMS.forEach(x => {
+    const d = mk("div", "ni"), im = mk("img"), t = mk("div");
+    im.src = x.i; im.alt = ""; im.width = 56; im.height = 41;
+    t.append(mk("b", "", x.n), mk("span", "", x.t));
+    d.append(im, t); ni.append(d);
+  });
   const heroes = HERO_DB;
   const byKey = Object.fromEntries(heroes.map(h => [h.k, h]));
   let attr = "all", query = "", cur = null;
