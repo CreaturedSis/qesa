@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Дота Рулетка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap">
+<style>
+/* Layout: две карточки игроков бок о бок (Radiant слева, Dire справа), под ними общий челлендж дуэта и история бросков. Тёмная «каменная» гамма по выбору, одна тема. */
+:root {
+  --bg: #15120f;
+  --panel: #1f1a16;
+  --panel-2: #29221c;
+  --line: #3a3027;
+  --ink: #efe6d6;
+  --muted: #a8998a;
+  --gold: #d9a94e;
+  --radiant: #63b48d;
+  --dire: #c9513f;
+  --troll: #b07ad9;
+  --display: "Alegreya SC", "Palatino Linotype", Georgia, serif;
+  --body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.5 var(--body);
+  padding-inline: 16px;
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 24px; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.brand h1 {
+  font-family: var(--display); font-weight: 800; margin: 0;
+  font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1; letter-spacing: .01em;
+  text-wrap: balance;
+}
+.brand h1 span { color: var(--gold); }
+.brand p { margin: 6px 0 0; color: var(--muted); max-width: 60ch; }
+
+.controls {
+  display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end;
+  padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+}
+.field { display: grid; gap: 4px; }
+.field label, .eyebrow {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 700;
+}
+select, input[type="text"] {
+  font: inherit; color: var(--ink); background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 4px; padding: 7px 10px; min-width: 0;
+}
+.seg { justify-self: start; display: inline-flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; background: var(--panel-2); color: var(--muted); padding: 7px 12px; }
+.seg button[aria-pressed="true"] { background: var(--gold); color: #1a140c; }
+
+button {
+  font: inherit; cursor: pointer; color: var(--ink); background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 4px; padding: 7px 12px; font-weight: 500;
+}
+button:hover { border-color: var(--gold); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.btn-main {
+  background: var(--gold); color: #1a140c; border-color: var(--gold);
+  font-family: var(--display); font-weight: 800; font-size: 1.15rem; padding: 10px 22px; letter-spacing: .03em;
+}
+.btn-main:hover { filter: brightness(1.08); }
+.spacer { flex: 1 1 auto; }
+
+.duel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 780px) { .duel { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  border-top: 4px solid var(--side); display: grid; gap: 16px; padding: 16px; min-width: 0;
+}
+.card.radiant { --side: var(--radiant); }
+.card.dire { --side: var(--dire); }
+.card-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.card-head input { flex: 1 1 140px; font-weight: 700; }
+.side-tag { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--side); font-weight: 700; }
+
+.hero { display: grid; gap: 6px; }
+.hero-name {
+  font-family: var(--display); font-weight: 800; font-size: clamp(1.8rem, 4.2vw, 2.6rem); line-height: 1.05;
+  text-wrap: balance; min-height: 1.1em;
+}
+.hero-name.spinning { color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: .78rem; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line);
+  color: var(--muted); background: var(--panel-2);
+}
+.chip.attr-str { color: #e0715d; border-color: #6a3329; }
+.chip.attr-agi { color: #7cc79a; border-color: #2f5a40; }
+.chip.attr-int { color: #6fa8e0; border-color: #2c4a6a; }
+.chip.attr-uni { color: var(--gold); border-color: #6a5326; }
+.chip.pos { color: var(--ink); border-color: var(--side); }
+
+.section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.archetype { font-family: var(--display); font-weight: 700; font-size: 1.15rem; color: var(--gold); }
+.arch-note { color: var(--muted); font-size: .92rem; margin: 2px 0 0; }
+
+ol.build { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; counter-reset: slot; }
+ol.build li {
+  counter-increment: slot; display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center;
+  padding: 7px 10px; background: var(--panel-2); border-radius: 4px; border-left: 3px solid var(--tier, var(--line));
+}
+ol.build li::before { content: counter(slot); font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; text-align: right; }
+ol.build li .nm { font-weight: 700; min-width: 0; }
+ol.build li .kind { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+ol.build li.t-boots { --tier: #8a7a63; }
+ol.build li.t-core { --tier: var(--gold); }
+ol.build li.t-lux { --tier: #e2c27a; }
+ol.build li.t-troll { --tier: var(--troll); }
+ol.build li.t-troll .kind { color: var(--troll); }
+
+.rules { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.rules li { padding: 8px 10px; border: 1px dashed var(--line); border-radius: 4px; font-size: .95rem; }
+.rules li b { color: var(--gold); font-weight: 700; }
+
+.meter { display: flex; align-items: center; gap: 10px; font-size: .9rem; color: var(--muted); flex-wrap: wrap; }
+.bar { flex: 1 1 120px; height: 8px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--side), var(--gold)); width: 0; transition: width .5s ease; }
+.quip { font-style: italic; color: var(--muted); margin: 0; }
+
+.card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.card-actions button[aria-pressed="true"] { border-color: var(--side); color: var(--side); }
+
+.duo {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;
+}
+.duo h2 { font-family: var(--display); margin: 0; font-size: 1.3rem; color: var(--gold); }
+.duo p { margin: 0; font-size: 1.05rem; }
+@media (max-width: 640px) { .duo { grid-template-columns: 1fr; } }
+
+.history { display: grid; gap: 8px; }
+.history h2 { font-family: var(--display); font-size: 1.2rem; margin: 0; }
+.history ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.history li { display: flex; gap: 12px; flex-wrap: wrap; font-size: .92rem; color: var(--muted); border-bottom: 1px solid var(--line); padding-block: 6px; }
+.history li time { font-variant-numeric: tabular-nums; }
+.history li b { color: var(--ink); font-weight: 500; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--gold); color: #1a140c; padding: 8px 16px; border-radius: 4px; font-weight: 700; }
+footer { color: var(--muted); font-size: .85rem; }
+
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Дота <span>Рулетка</span></h1>
+      <p>Случайный герой, позиция и сборка на двоих. Сборка собирается под роль героя, а сверху ложится пара челленджей, чтобы каток было что вспомнить.</p>
+    </div>
+    <button class="btn-main" id="rollAll" type="button">Крутить обоих</button>
+  </header>
+
+  <div class="controls">
+    <div class="field">
+      <label for="mode">Режим сборки</label>
+      <select id="mode">
+        <option value="smart">Под роль героя</option>
+        <option value="arch" selected>Тематический архетип</option>
+        <option value="chaos">Полный хаос</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="attr">Атрибут</label>
+      <select id="attr">
+        <option value="any">Любой</option>
+        <option value="str">Сила</option>
+        <option value="agi">Ловкость</option>
+        <option value="int">Интеллект</option>
+        <option value="uni">Универсал</option>
+      </select>
+    </div>
+    <div class="field">
+      <span class="eyebrow" id="chaosLbl">Челленджей на игрока</span>
+      <div class="seg" role="group" aria-labelledby="chaosLbl" id="chaosSeg">
+        <button type="button" data-v="0" aria-pressed="false">0</button>
+        <button type="button" data-v="1" aria-pressed="false">1</button>
+        <button type="button" data-v="2" aria-pressed="true">2</button>
+        <button type="button" data-v="3" aria-pressed="false">3</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="eyebrow" id="posLbl">Позиция</span>
+      <div class="seg" role="group" aria-labelledby="posLbl" id="posSeg">
+        <button type="button" data-v="hero" aria-pressed="true">Родная</button>
+        <button type="button" data-v="random" aria-pressed="false">Случайная</button>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <button type="button" id="copy">Скопировать для Discord</button>
+  </div>
+
+  <section class="duel" id="duel"></section>
+
+  <section class="duo" aria-live="polite">
+    <h2>Задание дуэта</h2>
+    <p id="duoText">…</p>
+    <button type="button" id="rerollDuo">Другое задание</button>
+  </section>
+
+  <section class="history">
+    <h2>Последние броски</h2>
+    <ul id="history"></ul>
+  </section>
+
+  <footer>Названия предметов даны как в клиенте игры. Если какого-то предмета нет в текущем патче, замени его ближайшим по смыслу, это тоже часть веселья.</footer>
+</div>
+
+<template id="cardTpl">
+  <article class="card">
+    <div class="card-head">
+      <span class="side-tag"></span>
+      <input type="text" class="pname" aria-label="Имя игрока">
+    </div>
+    <div class="hero">
+      <div class="hero-name" aria-live="polite">…</div>
+      <div class="chips"></div>
+    </div>
+    <div>
+      <div class="section-title"><span class="archetype"></span><span class="eyebrow">сборка</span></div>
+      <p class="arch-note"></p>
+    </div>
+    <ol class="build"></ol>
+    <div>
+      <div class="eyebrow">Челленджи</div>
+      <ul class="rules"></ul>
+    </div>
+    <div class="meter"><span>Индекс угара</span><span class="bar"><i></i></span><b class="fun-val">0</b></div>
+    <p class="quip"></p>
+    <div class="card-actions">
+      <button type="button" data-act="roll">Перекрутить всё</button>
+      <button type="button" data-act="build">Только сборку</button>
+      <button type="button" data-act="lock" aria-pressed="false">Закрепить героя</button>
+    </div>
+  </article>
+</template>
+
+<script>
+(() => {
+  // ── Герои: [имя, атрибут, позиции] ────────────────────────────────
+  const HEROES = [
+    ["Axe","str",[3]],["Pudge","str",[4,3]],["Earthshaker","str",[4,3]],["Tiny","str",[2,4]],["Sven","str",[1]],
+    ["Tidehunter","str",[3]],["Bristleback","str",[3,2]],["Centaur Warrunner","str",[3]],["Dragon Knight","str",[2,3]],
+    ["Legion Commander","str",[3]],["Kunkka","str",[2,3]],["Slardar","str",[3]],["Wraith King","str",[1]],["Huskar","str",[2]],
+    ["Mars","str",[3]],["Night Stalker","str",[3]],["Ogre Magi","str",[5]],["Spirit Breaker","str",[4]],["Timbersaw","str",[3]],
+    ["Underlord","str",[3]],["Tusk","str",[4]],["Primal Beast","str",[3]],["Chaos Knight","str",[1]],["Doom","str",[3]],
+    ["Lifestealer","str",[1]],["Earth Spirit","str",[4]],["Elder Titan","str",[5]],["Treant Protector","str",[5]],
+    ["Omniknight","str",[5]],["Alchemist","str",[1,2]],["Dawnbreaker","str",[3]],["Undying","str",[5]],["Clockwerk","str",[4]],
+    ["Anti-Mage","agi",[1]],["Juggernaut","agi",[1]],["Phantom Assassin","agi",[1]],["Faceless Void","agi",[1]],["Spectre","agi",[1]],
+    ["Medusa","agi",[1]],["Terrorblade","agi",[1]],["Slark","agi",[1]],["Luna","agi",[1]],["Drow Ranger","agi",[1]],
+    ["Morphling","agi",[1,2]],["Naga Siren","agi",[1]],["Phantom Lancer","agi",[1]],["Troll Warlord","agi",[1]],["Ursa","agi",[1]],
+    ["Weaver","agi",[1,4]],["Sniper","agi",[2]],["Templar Assassin","agi",[2]],["Ember Spirit","agi",[2]],["Monkey King","agi",[1,2]],
+    ["Bloodseeker","agi",[1,3]],["Riki","agi",[1,4]],["Bounty Hunter","agi",[4]],["Viper","agi",[2,3]],["Razor","agi",[3]],
+    ["Gyrocopter","agi",[1]],["Hoodwink","agi",[4]],["Meepo","agi",[2]],["Arc Warden","agi",[2]],["Clinkz","agi",[1,2]],
+    ["Crystal Maiden","int",[5]],["Lion","int",[4,5]],["Lina","int",[2]],["Zeus","int",[2,4]],["Shadow Shaman","int",[5]],
+    ["Witch Doctor","int",[5]],["Lich","int",[5]],["Jakiro","int",[5]],["Disruptor","int",[5]],["Skywrath Mage","int",[4]],
+    ["Ancient Apparition","int",[5]],["Warlock","int",[5]],["Oracle","int",[5]],["Silencer","int",[5]],["Shadow Demon","int",[5]],
+    ["Rubick","int",[4]],["Outworld Destroyer","int",[2]],["Puck","int",[2]],["Queen of Pain","int",[2]],["Storm Spirit","int",[2]],
+    ["Tinker","int",[2]],["Death Prophet","int",[2,3]],["Leshrac","int",[2]],["Necrophos","int",[2,3]],["Pugna","int",[4,2]],
+    ["Keeper of the Light","int",[4]],["Grimstroke","int",[4,5]],["Chen","int",[5]],["Enchantress","int",[5]],
+    ["Nature's Prophet","int",[3,4]],["Muerta","int",[1]],
+    ["Windranger","uni",[2]],["Mirana","uni",[4]],["Magnus","uni",[3]],["Enigma","uni",[3]],["Dark Willow","uni",[4]],
+    ["Pangolier","uni",[3]],["Void Spirit","uni",[2]],["Batrider","uni",[3]],["Phoenix","uni",[4]],["Snapfire","uni",[4]],
+    ["Venomancer","uni",[4]],["Vengeful Spirit","uni",[5]],["Marci","uni",[4]],["Nyx Assassin","uni",[4]],["Sand King","uni",[3,4]],
+    ["Dazzle","uni",[5]],["Io","uni",[5]],["Techies","uni",[4]],["Dark Seer","uni",[3]],["Bane","uni",[5]],["Brewmaster","uni",[3]],
+    ["Beastmaster","uni",[3]],["Visage","uni",[2]],["Lycan","uni",[1,3]],["Lone Druid","uni",[1]],["Broodmother","uni",[2]],
+    ["Abaddon","uni",[3,1]],["Winter Wyvern","uni",[5]],["Invoker","uni",[2]]
+  ];
+  const ATTR = { str: "Сила", agi: "Ловкость", int: "Интеллект", uni: "Универсал" };
+  const POS = { 1: "Pos 1 · керри", 2: "Pos 2 · мид", 3: "Pos 3 · хардлейн", 4: "Pos 4 · роумер", 5: "Pos 5 · фулл-саппорт" };
+
+  // ── Предметы ──────────────────────────────────────────────────────
+  const BOOTS = {
+    core: ["Power Treads","Phase Boots","Boots of Travel","Arcane Boots"],
+    sup: ["Arcane Boots","Tranquil Boots","Guardian Greaves","Boots of Bearing"],
+  };
+  const ALL_BOOTS = [...new Set([...BOOTS.core, ...BOOTS.sup])];
+  const POOLS = {
+    1: ["Battle Fury","Manta Style","Black King Bar","Butterfly","Daedalus","Satanic","Abyssal Blade","Eye of Skadi","Monkey King Bar","Desolator","Mjollnir","Disperser","Bloodthorn","Radiance","Silver Edge","Hurricane Pike","Swift Blink","Sange and Yasha","Harpoon","Linken's Sphere","Nullifier","Assault Cuirass","Moon Shard","Aghanim's Scepter"],
+    2: ["Aghanim's Scepter","Octarine Core","Kaya and Sange","Yasha and Kaya","Bloodstone","Scythe of Vyse","Shiva's Guard","Refresher Orb","Ethereal Blade","Dagon","Arcane Blink","Wind Waker","Parasma","Khanda","Witch Blade","Revenant's Brooch","Black King Bar","Linken's Sphere","Orchid Malevolence","Eternal Shroud","Aeon Disk","Desolator","Daedalus"],
+    3: ["Blink Dagger","Overwhelming Blink","Black King Bar","Pipe of Insight","Crimson Guard","Blade Mail","Heaven's Halberd","Assault Cuirass","Shiva's Guard","Lotus Orb","Vladmir's Offering","Heart of Tarrasque","Aghanim's Scepter","Radiance","Kaya and Sange","Eternal Shroud","Nullifier","Refresher Orb","Helm of the Overlord","Aeon Disk"],
+    4: ["Glimmer Cape","Force Staff","Aether Lens","Solar Crest","Spirit Vessel","Rod of Atos","Gleipnir","Lotus Orb","Aghanim's Scepter","Blink Dagger","Wind Waker","Holy Locket","Pavise","Veil of Discord","Aeon Disk","Octarine Core","Scythe of Vyse","Orchid Malevolence"],
+    5: ["Glimmer Cape","Force Staff","Aether Lens","Solar Crest","Rod of Atos","Lotus Orb","Aghanim's Scepter","Ghost Scepter","Wind Waker","Holy Locket","Pavise","Mekansm","Pipe of Insight","Aeon Disk","Scythe of Vyse","Guardian Greaves","Eul's Scepter of Divinity","Veil of Discord"],
+  };
+  const ALL_ITEMS = [...new Set(Object.values(POOLS).flat().concat(["Divine Rapier","Hand of Midas","Armlet of Mordiggian","Meteor Hammer","Mask of Madness","Shadow Blade","Diffusal Blade","Dragon Lance","Mage Slayer","Falcon Blade","Orb of Corrosion","Spirit Vessel","Gem of True Sight","Heart of Tarrasque","Butterfly","Satanic"]))].filter(i => !ALL_BOOTS.includes(i));
+
+  const TWISTS = [
+    ["Divine Rapier", "купить к 30-й минуте и не потерять до конца игры"],
+    ["Dagon", "прокачать до 5 уровня, сколько бы он ни стоил"],
+    ["Hand of Midas", "первым предметом после сапог, даже на саппорте"],
+    ["Armlet of Mordiggian", "держать включённым всю драку и не выключать"],
+    ["Meteor Hammer", "минимум три попадания по героям за игру"],
+    ["Gem of True Sight", "купить к 20-й минуте и носить на себе"],
+    ["Moon Shard", "съесть самому, а второй подарить другу"],
+    ["Heart of Tarrasque", "собрать, даже если ты мид-маг"],
+    ["Aghanim's Scepter", "купить и сразу подарить другу"],
+    ["Mask of Madness", "в каждой драке включать первым делом"],
+    ["Shadow Blade", "каждая инициация только из инвиза"],
+    ["Blade Mail", "в каждой драке нажимать её первой"],
+    ["Radiance", "собрать на любом герое, даже на Crystal Maiden"],
+    ["Refresher Orb", "в каждой драке прожимать ульту дважды"],
+    ["Ethereal Blade", "использовать на союзника хотя бы раз, чтобы спасти"],
+  ];
+
+  const ARCHETYPES = [
+    { name: "Стеклянная пушка", note: "Только урон. Никакой брони, никакого HP, никакого BKB.", boots: ["Phase Boots","Power Treads"],
+      items: ["Daedalus","Divine Rapier","Desolator","Monkey King Bar","Bloodthorn","Butterfly","Silver Edge","Moon Shard","Dagon","Ethereal Blade"] },
+    { name: "Живая крепость", note: "Урона почти нет. Задача: не умереть ни разу и стоять в центре драки.", boots: ["Boots of Bearing","Guardian Greaves","Phase Boots"],
+      items: ["Heart of Tarrasque","Assault Cuirass","Shiva's Guard","Crimson Guard","Pipe of Insight","Lotus Orb","Blade Mail","Eternal Shroud","Heaven's Halberd","Aeon Disk"] },
+    { name: "Маг на всё", note: "Каждый предмет даёт ману, урон заклинаниями или кнопку.", boots: ["Arcane Boots","Boots of Travel"],
+      items: ["Octarine Core","Aether Lens","Ethereal Blade","Dagon","Scythe of Vyse","Parasma","Shiva's Guard","Wind Waker","Refresher Orb","Kaya and Sange","Khanda"] },
+    { name: "Скорость света", note: "Цель: 550 скорости передвижения к 25-й минуте.", boots: ["Boots of Travel","Phase Boots"],
+      items: ["Sange and Yasha","Yasha and Kaya","Butterfly","Shadow Blade","Wind Waker","Swift Blink","Hurricane Pike","Mask of Madness","Manta Style","Diffusal Blade"] },
+    { name: "Вампир", note: "Весь отхил только через вампиризм. Фонтан для слабаков.", boots: ["Phase Boots","Power Treads"],
+      items: ["Satanic","Mask of Madness","Vladmir's Offering","Bloodstone","Kaya and Sange","Armlet of Mordiggian","Eternal Shroud","Spirit Vessel","Heart of Tarrasque"] },
+    { name: "Ниндзя", note: "Тебя никто не видит, пока ты не нажмёшь кнопку.", boots: ["Phase Boots","Power Treads","Tranquil Boots"],
+      items: ["Shadow Blade","Silver Edge","Glimmer Cape","Blink Dagger","Swift Blink","Diffusal Blade","Orchid Malevolence","Bloodthorn","Nullifier"] },
+    { name: "Ходячий фонтан", note: "Только ауры и командные предметы. Ты нужен всем.", boots: ["Guardian Greaves","Boots of Bearing"],
+      items: ["Vladmir's Offering","Assault Cuirass","Pipe of Insight","Shiva's Guard","Radiance","Crimson Guard","Helm of the Overlord","Mekansm","Holy Locket","Solar Crest"] },
+    { name: "Контроль-фрик", note: "Ни один враг не должен двигаться дольше двух секунд.", boots: ["Arcane Boots","Tranquil Boots","Power Treads"],
+      items: ["Scythe of Vyse","Abyssal Blade","Gleipnir","Rod of Atos","Orchid Malevolence","Bloodthorn","Wind Waker","Heaven's Halberd","Nullifier","Disperser","Eye of Skadi"] },
+    { name: "Кнопочник", note: "Чем больше активных предметов, тем лучше. Пустых слотов под пассивки нет.", boots: ["Boots of Travel","Arcane Boots"],
+      items: ["Refresher Orb","Blade Mail","Black King Bar","Lotus Orb","Arcane Blink","Force Staff","Glimmer Cape","Satanic","Ethereal Blade","Wind Waker","Gleipnir"] },
+  ];
+
+  const CHALLENGES = [
+    () => `Первой максишь способность <b>${pick(["Q","W","E"])}</b>, всё остальное потом`,
+    () => "Ульту качаешь только на <b>12 уровне</b>",
+    () => "Никаких сапог до <b>12-й минуты</b>",
+    () => "Таланты выбираешь <b>только левые</b>",
+    () => "Таланты выбираешь <b>только правые</b>",
+    () => "Ни одного TP-свитка до <b>10-й минуты</b>",
+    () => "Денаи запрещены: свои крипы для тебя святые",
+    () => "В лес не заходишь до <b>8-й минуты</b>",
+    () => "Как только накопил <b>4000 золота</b>, тратишь всё сразу",
+    () => "Рюкзак должен быть пустым всю игру",
+    () => "Минимум <b>5 обсерверов</b> за игру, даже если ты керри",
+    () => "В каждую драку прыгаешь <b>первым</b>",
+    () => "Первый предмет после сапог берёшь из сборки целиком, без промежуточных компонентов в слотах",
+    () => "Последний удар по Рошану обязан сделать ты",
+    () => "Каждая смерть = вард в самое нелепое место на карте",
+    () => "Никаких Blink Dagger, даже если герой без него не живёт",
+    () => "Покупаешь <b>Aghanim's Shard</b> первым после сапог",
+    () => "Стартовый закуп: <b>только Tango</b> на всё золото",
+    () => "Телепорт в башню запрещён, на защиту бежишь ногами",
+    () => `Лейнишься на чужой линии: <b>${pick(["топ","мид","бот"])}</b>, не на родной`,
+    () => "Купи Gem of True Sight к 20-й минуте и не потеряй его",
+    () => "Ни одного захода в Roshan pit без друга",
+  ];
+  const DUO = [
+    "Стойте на одной линии первые 10 минут, кто бы что ни говорил",
+    "Убейте Рошана вдвоём до 25-й минуты",
+    "Все драки начинаете вдвоём: никаких соло-заходов",
+    "Если друг умер, у тебя 30 секунд, чтобы отомстить",
+    "Каждый покупает один предмет из сборки друга",
+    "Кто беднее на 20-й минуте, тот выбирает героя другому на следующую игру",
+    "Каждые 5 минут один из вас покупает Smoke of Deceit, и вы гангаете вместе",
+    "Победитель по KDA выбирает челлендж проигравшему на следующую катку",
+    "Двойной килл вдвоём до 15-й минуты, иначе следующий бросок без перекрутов",
+    "Один из вас обязан носить Gem, другой охраняет его ценой жизни",
+  ];
+  const QUIPS = [
+    "Аналитики уже ставят против тебя.", "Звучит как план. Плохой, но план.", "Тиммейты будут в восторге. Нет.",
+    "Если выиграешь, это будет легенда.", "Создатели игры такого не задумывали.", "Пиши в чат «так задумано».",
+    "MMR временный, история вечная.", "Сначала смешно, потом страшно, потом снова смешно.", "Это может сработать. Наверное.",
+  ];
+
+  // ── Утилиты ───────────────────────────────────────────────────────
+  const rnd = n => Math.floor(Math.random() * n);
+  const pick = a => a[rnd(a.length)];
+  const sample = (a, n) => { const c = [...a]; const out = []; while (out.length < n && c.length) out.push(c.splice(rnd(c.length), 1)[0]); return out; };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const settings = { mode: "arch", attr: "any", chaos: 2, pos: "hero" };
+  const players = [
+    { side: "radiant", tag: "Radiant", name: store.get("dr-name-0", "Нурбек"), locked: false, hero: null, roll: null },
+    { side: "dire", tag: "Dire", name: store.get("dr-name-1", "Друг"), locked: false, hero: null, roll: null },
+  ];
+  let duoText = "";
+
+  // ── Генерация ─────────────────────────────────────────────────────
+  function rollHero(exclude) {
+    let pool = HEROES.filter(h => settings.attr === "any" || h[1] === settings.attr);
+    pool = pool.filter(h => h[0] !== exclude);
+    return pick(pool.length ? pool : HEROES);
+  }
+  function rollPos(hero) { return settings.pos === "random" ? 1 + rnd(5) : pick(hero[2]); }
+
+  function rollBuild(pos) {
+    const isCore = pos <= 3;
+    const items = [];
+    let title, note;
+    if (settings.mode === "chaos") {
+      title = "Полный хаос";
+      note = "Шесть случайных слотов. Логика отключена, удача включена.";
+      items.push({ n: pick(ALL_BOOTS), t: "boots", k: "сапоги" });
+      sample(ALL_ITEMS, 5).forEach((n, i) => items.push({ n, t: i > 2 ? "lux" : "core", k: i > 2 ? "лейт" : "кор" }));
+    } else if (settings.mode === "arch") {
+      const a = pick(ARCHETYPES);
+      title = a.name; note = a.note;
+      items.push({ n: pick(a.boots), t: "boots", k: "сапоги" });
+      sample(a.items, 5).forEach((n, i) => items.push({ n, t: i > 2 ? "lux" : "core", k: i > 2 ? "лейт" : "кор" }));
+    } else {
+      title = "Под роль";
+      note = `Сборка из пула для ${POS[pos].toLowerCase()}, плюс один сумасшедший слот.`;
+      items.push({ n: pick(isCore ? BOOTS.core : BOOTS.sup), t: "boots", k: "сапоги" });
+      sample(POOLS[pos], 4).forEach((n, i) => items.push({ n, t: i > 1 ? "lux" : "core", k: i > 1 ? "лейт" : "кор" }));
+    }
+    // Каждый режим получает один «тролль-слот» с условием
+    const used = new Set(items.map(i => i.n));
+    const tw = pick(TWISTS.filter(t => !used.has(t[0])));
+    if (settings.mode === "smart") items.push({ n: tw[0], t: "troll", k: "угар" });
+    else items[items.length - 1] = { n: tw[0], t: "troll", k: "угар" };
+    return { title, note, items, twist: tw };
+  }
+
+  function rollChallenges() { return sample(CHALLENGES, settings.chaos).map(f => f()); }
+
+  function funScore(r) {
+    let s = 30 + settings.chaos * 14 + (settings.mode === "chaos" ? 18 : settings.mode === "arch" ? 10 : 0);
+    if (r.offRole) s += 12;
+    if (r.build.items.some(i => i.n === "Divine Rapier")) s += 8;
+    return Math.min(100, s + rnd(8));
+  }
+
+  function rollPlayer(p, onlyBuild) {
+    const other = players.find(x => x !== p);
+    if (!onlyBuild && !p.locked) p.hero = rollHero(other.hero && other.hero[0]);
+    if (!p.hero) p.hero = rollHero();
+    const pos = onlyBuild && p.roll ? p.roll.pos : rollPos(p.hero);
+    const r = { pos, offRole: !p.hero[2].includes(pos), build: rollBuild(pos), rules: rollChallenges() };
+    r.rules.unshift(`<b>${r.build.twist[0]}</b>: ${r.build.twist[1]}`);
+    r.fun = funScore(r);
+    r.quip = pick(QUIPS);
+    p.roll = r;
+  }
+
+  // ── Рендер ────────────────────────────────────────────────────────
+  const duel = document.getElementById("duel");
+  const tpl = document.getElementById("cardTpl");
+  const cards = players.map((p, idx) => {
+    const node = tpl.content.firstElementChild.cloneNode(true);
+    node.classList.add(p.side);
+    node.querySelector(".side-tag").textContent = p.tag;
+    const inp = node.querySelector(".pname");
+    inp.id = `pname-${idx}`;
+    inp.value = p.name;
+    inp.addEventListener("input", () => { p.name = inp.value.trim() || p.tag; store.set(`dr-name-${idx}`, p.name); });
+    node.querySelector('[data-act="roll"]').addEventListener("click", () => spin([idx]));
+    node.querySelector('[data-act="build"]').addEventListener("click", () => { rollPlayer(p, true); render(idx); });
+    const lockBtn = node.querySelector('[data-act="lock"]');
+    lockBtn.addEventListener("click", () => {
+      p.locked = !p.locked;
+      lockBtn.setAttribute("aria-pressed", String(p.locked));
+      lockBtn.textContent = p.locked ? "Герой закреплён" : "Закрепить героя";
+    });
+    duel.appendChild(node);
+    return node;
+  });
+
+  function render(idx) {
+    const p = players[idx], c = cards[idx], r = p.roll;
+    const nameEl = c.querySelector(".hero-name");
+    nameEl.classList.remove("spinning");
+    nameEl.textContent = p.hero[0];
+    const chips = c.querySelector(".chips");
+    chips.innerHTML = "";
+    const addChip = (txt, cls) => { const s = document.createElement("span"); s.className = "chip " + cls; s.textContent = txt; chips.appendChild(s); };
+    addChip(ATTR[p.hero[1]], "attr-" + p.hero[1]);
+    addChip(POS[r.pos], "pos");
+    if (r.offRole) addChip("не родная роль", "");
+    c.querySelector(".archetype").textContent = r.build.title;
+    c.querySelector(".arch-note").textContent = r.build.note;
+    const ol = c.querySelector(".build");
+    ol.innerHTML = "";
+    r.build.items.forEach(it => {
+      const li = document.createElement("li");
+      li.className = "t-" + it.t;
+      li.innerHTML = `<span class="nm"></span><span class="kind"></span>`;
+      li.querySelector(".nm").textContent = it.n;
+      li.querySelector(".kind").textContent = it.k;
+      ol.appendChild(li);
+    });
+    const ul = c.querySelector(".rules");
+    ul.innerHTML = r.rules.map(x => `<li>${x}</li>`).join("");
+    c.querySelector(".bar i").style.width = r.fun + "%";
+    c.querySelector(".fun-val").textContent = r.fun;
+    c.querySelector(".quip").textContent = r.quip;
+  }
+
+  function renderDuo() { document.getElementById("duoText").textContent = duoText; }
+
+  function spin(idxs) {
+    idxs.forEach(i => rollPlayer(players[i]));
+    const finish = () => { idxs.forEach(render); pushHistory(); };
+    if (reduceMotion) return finish();
+    const targets = idxs.filter(i => !players[i].locked);
+    if (!targets.length) return finish();
+    let t = 0;
+    const timer = setInterval(() => {
+      targets.forEach(i => {
+        const el = cards[i].querySelector(".hero-name");
+        el.classList.add("spinning");
+        el.textContent = pick(HEROES)[0];
+      });
+      if (++t >= 14) { clearInterval(timer); finish(); }
+    }, 55);
+  }
+
+  // ── История ───────────────────────────────────────────────────────
+  let history = store.get("dr-history", []);
+  function pushHistory() {
+    const now = new Date();
+    history.unshift({
+      t: now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }),
+      s: players.map(p => `${p.name}: ${p.hero[0]} (pos ${p.roll.pos}, ${p.roll.build.title})`).join("  ·  "),
+    });
+    history = history.slice(0, 8);
+    store.set("dr-history", history);
+    renderHistory();
+  }
+  function renderHistory() {
+    const ul = document.getElementById("history");
+    ul.innerHTML = "";
+    if (!history.length) { ul.innerHTML = "<li>Пока пусто. Жми «Крутить обоих».</li>"; return; }
+    history.forEach(h => {
+      const li = document.createElement("li");
+      li.innerHTML = "<time></time><b></b>";
+      li.querySelector("time").textContent = h.t;
+      li.querySelector("b").textContent = h.s;
+      ul.appendChild(li);
+    });
+  }
+
+  // ── Копирование ───────────────────────────────────────────────────
+  const strip = s => s.replace(/<[^>]+>/g, "");
+  function asText() {
+    const lines = ["**Дота Рулетка**"];
+    players.forEach(p => {
+      const r = p.roll;
+      lines.push("", `**${p.name}** → ${p.hero[0]} · ${POS[r.pos]}`, `Сборка «${r.build.title}»: ${r.build.items.map(i => i.n).join(" → ")}`);
+      r.rules.forEach(x => lines.push(`• ${strip(x)}`));
+    });
+    lines.push("", `Задание дуэта: ${duoText}`);
+    return lines.join("\n");
+  }
+  function toast(msg) {
+    const d = document.createElement("div");
+    d.className = "toast"; d.textContent = msg; d.setAttribute("role", "status");
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 1800);
+  }
+  document.getElementById("copy").addEventListener("click", () => {
+    const txt = asText();
+    const fallback = () => {
+      const ta = document.createElement("textarea");
+      ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand("copy"); } catch {}
+      ta.remove();
+      toast(ok ? "Скопировано" : "Не удалось скопировать");
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(() => toast("Скопировано"), fallback);
+    } else fallback();
+  });
+
+  // ── Настройки ─────────────────────────────────────────────────────
+  document.getElementById("mode").addEventListener("change", e => { settings.mode = e.target.value; });
+  document.getElementById("attr").addEventListener("change", e => { settings.attr = e.target.value; });
+  function seg(id, key, cast) {
+    const box = document.getElementById(id);
+    box.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return;
+      box.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      settings[key] = cast(b.dataset.v);
+    });
+  }
+  seg("chaosSeg", "chaos", Number);
+  seg("posSeg", "pos", String);
+
+  document.getElementById("rollAll").addEventListener("click", () => { duoText = pick(DUO); renderDuo(); spin([0, 1]); });
+  document.getElementById("rerollDuo").addEventListener("click", () => { duoText = pick(DUO.filter(d => d !== duoText)); renderDuo(); });
+
+  // Стартовое состояние: сразу показываем готовый бросок
+  players.forEach(p => rollPlayer(p));
+  players.forEach((_, i) => render(i));
+  duoText = pick(DUO);
+  renderDuo();
+  renderHistory();
+})();
+</script>
+</body>
+</html>
